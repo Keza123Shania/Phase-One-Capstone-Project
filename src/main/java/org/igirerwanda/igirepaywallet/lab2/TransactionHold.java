@@ -3,22 +3,7 @@ package org.igirerwanda.igirepaywallet.lab2;
 import java.time.LocalDateTime;
 
 
-/**
- * TransactionHold Model Class
- * 
- * Represents a hold placed on an account's balance for a pending transfer.
- * Holds ensure that the balance cannot be spent while a transfer is in progress,
- * preventing overdrafts and ensuring sufficient funds at transaction completion.
- * 
- * Use Case:
- * - Customer A initiates transfer of 5000 RWF to Customer B
- * - Customer A's balance is 10000 RWF
- * - Hold of 5000 RWF created → available balance becomes 5000 RWF
- * - If transfer succeeds: hold released, balance becomes 5000 RWF (after debit)
- * - If transfer fails: hold released, balance returns to 10000 RWF
- * 
- * Status values: ACTIVE, RELEASED, EXPIRED
- */
+
 public class TransactionHold {
     private int id;
     private int accountId;
@@ -31,9 +16,7 @@ public class TransactionHold {
     private String releaseReason;           // Why hold was released (e.g., "TRANSFER_SUCCESS", "TRANSFER_FAILED")
     private LocalDateTime expiresAt;        // When hold expires (auto-release if no action)
 
-    /**
-     * Constructor for creating a new hold (without ID).
-     */
+
     public TransactionHold(int accountId, double amount, String referenceId, String reason) {
         this.accountId = accountId;
         this.amount = amount;
@@ -42,13 +25,11 @@ public class TransactionHold {
         this.status = "ACTIVE";
         this.reason = reason;
         this.releaseReason = null;
-        // Set expiry to 24 hours from now (default hold duration)
+
         this.expiresAt = LocalDateTime.now().plusHours(24);
     }
 
-    /**
-     * Full constructor for loading from database.
-     */
+
     public TransactionHold(int id, int accountId, double amount, String referenceId, 
                           LocalDateTime holdTime, LocalDateTime releaseTime, String status,
                           String reason, String releaseReason, LocalDateTime expiresAt) {
@@ -64,9 +45,7 @@ public class TransactionHold {
         this.expiresAt = expiresAt;
     }
 
-    // ============================================
-    // Getters and Setters
-    // ============================================
+
 
     public int getId() {
         return id;
@@ -148,23 +127,17 @@ public class TransactionHold {
         this.expiresAt = expiresAt;
     }
 
-    /**
-     * Check if hold is still active (before expiry).
-     */
+
     public boolean isActive() {
         return "ACTIVE".equals(this.status);
     }
 
-    /**
-     * Check if hold has expired based on current time.
-     */
+
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.expiresAt);
     }
 
-    /**
-     * Get duration in seconds since hold was created.
-     */
+
     public long getDurationSeconds() {
         LocalDateTime endTime = (releaseTime != null) ? releaseTime : LocalDateTime.now();
         return java.time.temporal.ChronoUnit.SECONDS.between(holdTime, endTime);

@@ -5,18 +5,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for AuditLog entities.
- * Handles all CRUD operations for audit logs in PostgreSQL.
- * 
- * All queries use PreparedStatements to prevent SQL injection.
- */
+
 public class AuditLogDAO {
     private Connection connection;
 
-    /**
-     * Constructor with database connection.
-     */
+
     public AuditLogDAO(Connection connection) {
         this.connection = connection;
     }
@@ -50,9 +43,7 @@ public class AuditLogDAO {
         return -1;
     }
 
-    /**
-     * Get audit log entry by ID.
-     */
+
     public AuditLog getAuditLogById(int id) {
         String sql = "SELECT * FROM audit_logs WHERE id = ?";
         
@@ -69,9 +60,7 @@ public class AuditLogDAO {
         return null;
     }
 
-    /**
-     * Get all audit logs for a specific account.
-     */
+
     public List<AuditLog> getAuditLogsByAccountId(int accountId) {
         String sql = "SELECT * FROM audit_logs WHERE account_id = ? ORDER BY created_at DESC";
         List<AuditLog> logs = new ArrayList<>();
@@ -89,9 +78,7 @@ public class AuditLogDAO {
         return logs;
     }
 
-    /**
-     * Get all audit logs for a specific action type.
-     */
+
     public List<AuditLog> getAuditLogsByAction(String action) {
         String sql = "SELECT * FROM audit_logs WHERE action = ? ORDER BY created_at DESC";
         List<AuditLog> logs = new ArrayList<>();
@@ -109,9 +96,7 @@ public class AuditLogDAO {
         return logs;
     }
 
-    /**
-     * Get all audit logs (with optional limit for performance).
-     */
+
     public List<AuditLog> getAllAuditLogs(int limit) {
         String sql = "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT ?";
         List<AuditLog> logs = new ArrayList<>();
@@ -129,9 +114,7 @@ public class AuditLogDAO {
         return logs;
     }
 
-    /**
-     * Get audit logs for a specific account within a date range.
-     */
+
     public List<AuditLog> getAuditLogsByAccountAndDateRange(int accountId, 
                                                             LocalDateTime startDate, 
                                                             LocalDateTime endDate) {
@@ -153,9 +136,7 @@ public class AuditLogDAO {
         return logs;
     }
 
-    /**
-     * Get count of audit logs for an account.
-     */
+
     public int getAuditLogCount(int accountId) {
         String sql = "SELECT COUNT(*) as count FROM audit_logs WHERE account_id = ?";
         
@@ -172,9 +153,7 @@ public class AuditLogDAO {
         return 0;
     }
 
-    /**
-     * Delete audit log entry (for archival purposes).
-     */
+
     public boolean deleteAuditLog(int id) {
         String sql = "DELETE FROM audit_logs WHERE id = ?";
         
@@ -188,9 +167,7 @@ public class AuditLogDAO {
         return false;
     }
 
-    /**
-     * Helper method to build AuditLog object from ResultSet.
-     */
+
     private AuditLog buildAuditLogFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         int accountId = rs.getInt("account_id");

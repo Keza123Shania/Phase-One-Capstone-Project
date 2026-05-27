@@ -191,7 +191,7 @@ public class Lab1Console {
         }
         
         try {
-            // Check for duplicates first
+
             if (idempotencyManager.isDuplicate(referenceId)) {
                 System.out.println("\n✗ DUPLICATE DETECTED!");
                 System.out.println("  This transaction reference was already processed.");

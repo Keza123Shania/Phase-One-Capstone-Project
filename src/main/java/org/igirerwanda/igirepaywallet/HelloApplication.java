@@ -15,18 +15,11 @@ import java.util.Scanner;
 public class HelloApplication extends Application {
 
     public static void main(String[] args) {
-        if (args.length > 0 && args[0].equals("--gui")) {
-            // Launch GUI mode
-            launch(args);
-        } else {
-            // Run console menu mode
-            runConsoleMenu();
-        }
+
+        launch(args);
     }
 
-    /**
-     * Console-based menu system for running demos
-     */
+
     private static void runConsoleMenu() {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -78,15 +71,24 @@ public class HelloApplication extends Application {
         scanner.close();
     }
 
-    /**
-     * JavaFX start method - called when GUI mode is launched
-     */
+
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("IgirePay Wallet System");
+
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("fxml/login-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+        
+
+        scene.getStylesheets().add(HelloApplication.class.getResource("css/styles.css").toExternalForm());
+        
+
+        org.igirerwanda.igirepaywallet.lab3.controllers.LoginController controller = fxmlLoader.getController();
+        controller.setStage(stage);
+        
+
+        stage.setTitle("IgirePay - Login");
         stage.setScene(scene);
+        stage.setOnCloseRequest(e -> System.exit(0));
         stage.show();
     }
 }

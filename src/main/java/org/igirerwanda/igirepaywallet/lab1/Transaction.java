@@ -13,9 +13,7 @@ public class Transaction {
     private String status;  // SUCCESS, FAILED, PENDING
     private String description;  // Optional notes about the transaction
 
-    /**
-     * Constructor for creating a new transaction.
-     */
+
     public Transaction(int accountId, String referenceId, String transactionType, 
                       double amount, String description) {
         this.accountId = accountId;
@@ -27,9 +25,7 @@ public class Transaction {
         this.description = description;
     }
 
-    /**
-     * Constructor with transaction ID (for loading from database).
-     */
+
     public Transaction(int transactionId, int accountId, String referenceId, 
                       String transactionType, double amount, LocalDateTime timestamp,
                       String status, String description) {
@@ -43,9 +39,7 @@ public class Transaction {
         this.description = description;
     }
 
-    // ============================================
-    // Getters and Setters
-    // ============================================
+
 
     public int getTransactionId() {
         return transactionId;

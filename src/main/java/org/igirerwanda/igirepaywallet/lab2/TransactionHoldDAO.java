@@ -10,30 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * TransactionHoldDAO - Data Access Object for TransactionHold
- * 
- * Manages all database operations for transaction holds:
- * - Creating holds when transfers initiated
- * - Releasing holds when transfers complete/fail
- * - Querying active holds for balance calculation
- * - Releasing expired holds
- * 
- * All queries use PreparedStatements for SQL injection prevention.
- */
+
 public class TransactionHoldDAO {
     private Connection connection;
 
-    /**
-     * Constructor - accepts a database connection.
-     */
+
     public TransactionHoldDAO(Connection connection) {
         this.connection = connection;
     }
 
     /**
-     * CREATE: Place a new hold on an account.
-     * 
+
      * @param hold The TransactionHold object to insert
      * @return The generated hold ID, or -1 if insertion failed
      */
@@ -67,8 +54,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * READ: Get a hold by ID.
-     * 
+
      * @param holdId The hold ID
      * @return TransactionHold object, or null if not found
      */
@@ -92,8 +78,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * READ: Get all active holds for an account.
-     * 
+
      * @param accountId The account ID
      * @return List of active holds on that account
      */
@@ -118,8 +103,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * READ: Calculate total amount on hold for an account.
-     * 
+
      * @param accountId The account ID
      * @return Sum of all active holds
      */
@@ -142,8 +126,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * UPDATE: Release a hold (mark as RELEASED with reason).
-     * 
+
      * @param holdId The hold ID
      * @param releaseReason Reason for release (e.g., "TRANSFER_SUCCESS", "TRANSFER_FAILED")
      * @return true if update successful
@@ -170,8 +153,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * UPDATE: Release multiple holds for an account by reference IDs.
-     * 
+
      * @param accountId The account ID
      * @param referenceIds List of reference IDs to release
      * @param releaseReason Reason for release
@@ -204,8 +186,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * DELETE: Remove a hold (admin operation or cleanup).
-     * 
+
      * @param holdId The hold ID
      * @return true if delete successful
      */
@@ -228,8 +209,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * Custom Query: Get hold by reference ID.
-     * 
+
      * @param referenceId The reference ID (transfer ID)
      * @return TransactionHold, or null if not found
      */
@@ -253,8 +233,7 @@ public class TransactionHoldDAO {
     }
 
     /**
-     * Custom Query: Get all holds (active and released) for an account.
-     * 
+
      * @param accountId The account ID
      * @return List of all holds for that account
      */
@@ -278,12 +257,7 @@ public class TransactionHoldDAO {
         return holds;
     }
 
-    /**
-     * Custom Query: Release all expired holds.
-     * Should be called periodically to auto-release holds that exceed expiry time.
-     * 
-     * @return Number of holds released
-     */
+
     public int releaseExpiredHolds() {
         String sql = "UPDATE transaction_holds SET status = ?, release_time = ?, release_reason = ? " +
                     "WHERE status = 'ACTIVE' AND expires_at < ? ";
@@ -306,9 +280,7 @@ public class TransactionHoldDAO {
         return 0;
     }
 
-    /**
-     * Helper method to build a TransactionHold object from a ResultSet.
-     */
+
     private TransactionHold buildHoldFromResultSet(ResultSet rs) throws SQLException {
         return new TransactionHold(
             rs.getInt("id"),

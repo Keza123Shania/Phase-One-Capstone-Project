@@ -8,16 +8,12 @@ public class SavingsAccount extends Account {
     private static final double MINIMUM_SAVINGS_BALANCE = 10000.0;  // Minimum balance required
     private static final String ACCOUNT_TYPE = "SAVINGS";
 
-    /**
-     * Constructor for creating a new savings account.
-     */
+
     public SavingsAccount(int customerId, double initialBalance, String pin) {
         super(customerId, initialBalance, pin, ACCOUNT_TYPE);
     }
 
-    /**
-     * Constructor for loading from database.
-     */
+
     public SavingsAccount(int accountId, int customerId, double balance, String pin,
                          LocalDateTime createdAt, boolean isActive) {
         super(accountId, customerId, balance, pin, ACCOUNT_TYPE, createdAt, isActive);
@@ -26,7 +22,7 @@ public class SavingsAccount extends Account {
     /**
      * Withdraw money from savings account.
      * Savings account charges 1% fee and enforces minimum balance.
-     * 
+     *
      * @param amount The amount to withdraw
      * @param referenceId Unique transaction ID for idempotency
      * @return true if withdrawal successful
@@ -36,21 +32,21 @@ public class SavingsAccount extends Account {
     public boolean withdraw(double amount, String referenceId) 
         throws DuplicateTransactionException {
         
-        // Validate amount
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be positive");
         }
 
-        // Calculate withdrawal fee (1% of amount)
+
         double fee = amount * WITHDRAWAL_FEE_PERCENTAGE;
         double totalDebit = amount + fee;
 
-        // Check if sufficient balance
+
         if (getBalance() < totalDebit) {
             throw new IllegalArgumentException("Insufficient balance for withdrawal (including 1% fee)");
         }
 
-        // Check if withdrawal would violate minimum balance
+
         double balanceAfterWithdrawal = getBalance() - totalDebit;
         if (balanceAfterWithdrawal < MINIMUM_SAVINGS_BALANCE) {
             throw new IllegalArgumentException(
@@ -77,12 +73,12 @@ public class SavingsAccount extends Account {
     public boolean deposit(double amount, String referenceId) 
         throws DuplicateTransactionException {
         
-        // Validate amount
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be positive");
         }
 
-        // Add to balance (no fees for deposits, encourages saving)
+
         setBalance(getBalance() + amount);
         return true;
     }
@@ -119,16 +115,12 @@ public class SavingsAccount extends Account {
         }
     }
 
-    /**
-     * Get the current minimum required balance.
-     */
+
     public double getMinimumBalance() {
         return MINIMUM_SAVINGS_BALANCE;
     }
 
-    /**
-     * Get the withdrawal fee percentage.
-     */
+
     public double getWithdrawalFeePercentage() {
         return WITHDRAWAL_FEE_PERCENTAGE * 100;  // Return as percentage (e.g., 1.0 for 1%)
     }

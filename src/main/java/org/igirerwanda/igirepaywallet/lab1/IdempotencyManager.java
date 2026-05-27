@@ -7,9 +7,7 @@ import java.util.Set;
 public class IdempotencyManager {
     private Set<String> processedReferenceIds;
 
-    /**
-     * Constructor initializes the set for tracking processed transactions.
-     */
+
     public IdempotencyManager() {
         this.processedReferenceIds = new HashSet<>();
     }
@@ -48,24 +46,17 @@ public class IdempotencyManager {
         processedReferenceIds.add(referenceId);
     }
 
-    /**
-     * Get the total number of processed transactions.
-     */
+
     public int getProcessedCount() {
         return processedReferenceIds.size();
     }
 
-    /**
-     * Clear all processed reference IDs (use with caution - for testing only).
-     */
+
     public void clearAllProcessed() {
         processedReferenceIds.clear();
     }
 
-    /**
-     * Get a copy of all processed reference IDs.
-     * (Useful for logging and auditing)
-     */
+
     public Set<String> getProcessedReferenceIds() {
         return new HashSet<>(processedReferenceIds);
     }

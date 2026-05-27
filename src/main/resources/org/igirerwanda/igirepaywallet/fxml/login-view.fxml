@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="600" prefWidth="800" spacing="20" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.igirerwanda.igirepaywallet.lab3.controllers.LoginController">
+    <HBox spacing="0" VBox.vgrow="ALWAYS">
+
+        <VBox alignment="CENTER" prefWidth="400" spacing="20" styleClass="primary-orange">
+            <Label text="IgirePay" styleClass="label-title" textFill="white" style="-fx-font-size: 32; -fx-font-weight: bold;"/>
+            <Label text="Wallet System" styleClass="label-subtitle" textFill="white" style="-fx-font-size: 20;"/>
+            <Label text="Secure Mobile Money Solution" textFill="white" style="-fx-font-size: 14;"/>
+        </VBox>
+
+
+        <VBox alignment="CENTER" prefWidth="400" spacing="20" styleClass="primary-light-beige">
+            <VBox spacing="30" style="-fx-padding: 40;">
+                <Label text="Sign In" styleClass="label-title" style="-fx-font-size: 28;"/>
+
+                <!-- Role Selection -->
+                <VBox spacing="10">
+                    <Label text="Select Role:" styleClass="label-subtitle"/>
+                    <HBox spacing="15">
+                        <Button fx:id="adminRoleButton" text="Admin" styleClass="btn-primary" prefWidth="120" onAction="#setAdminRole"/>
+                        <Button fx:id="customerRoleButton" text="Customer" styleClass="btn-secondary" prefWidth="120" onAction="#setCustomerRole"/>
+                    </HBox>
+                </VBox>
+
+                <Separator style="-fx-border-color: #DCE4B8; -fx-padding: 5;"/>
+
+
+                <VBox fx:id="adminLoginBox" spacing="15" visible="false" managed="false">
+                    <Label text="Admin Username:" styleClass="label-info"/>
+                    <TextField fx:id="adminUsernameField" promptText="Enter admin username" styleClass="text-field"/>
+
+                    <Label text="Admin Password:" styleClass="label-info"/>
+                    <PasswordField fx:id="adminPasswordField" promptText="Enter admin password" styleClass="password-field"/>
+
+                    <Button fx:id="adminLoginButton" text="Login as Admin" styleClass="btn-primary" onAction="#loginAsAdmin"/>
+                </VBox>
+
+
+                <VBox fx:id="customerLoginBox" spacing="15">
+                    <Label text="Customer ID:" styleClass="label-info"/>
+                    <TextField fx:id="customerIdField" promptText="Enter customer ID" styleClass="text-field"/>
+
+                    <Label text="PIN:" styleClass="label-info"/>
+                    <PasswordField fx:id="pinField" promptText="Enter your 4-digit PIN" styleClass="password-field"/>
+
+                    <Button fx:id="customerLoginButton" text="Login as Customer" styleClass="btn-success" onAction="#loginAsCustomer"/>
+                </VBox>
+
+
+                <Label fx:id="errorLabel" styleClass="alert-error" textAlignment="CENTER" wrapText="true"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

@@ -34,7 +34,7 @@ public class Lab2Console {
             return;
         }
 
-        // Initialize DAOs
+
         try {
             customerDAO = new CustomerDAO(connection);
             accountDAO = new AccountDAO(connection);
@@ -377,25 +377,25 @@ public class Lab2Console {
         System.out.println("  Current Status: " + account.getAccountStatus());
         System.out.println("  Failed Attempts: " + account.getFailedPinAttempts());
         
-        // Simulate 3 failed PIN attempts
+
         System.out.println("\n→ Simulating 3 failed PIN attempts...");
         for (int i = 1; i <= 3; i++) {
             System.out.println("  Attempt " + i + " - FAILED");
             accountDAO.updateFailedPinAttempts(accountId, i);
         }
         
-        // Lock the account
+
         System.out.println("\n→ Locking account after 3 failed attempts...");
         java.time.LocalDateTime lockedUntil = java.time.LocalDateTime.now().plusMinutes(30);
         accountDAO.lockAccount(accountId, lockedUntil);
         
-        // Verify lock
+
         var lockedAccount = accountDAO.getAccountById(accountId);
         System.out.println("\n✓ Account Status: " + lockedAccount.getAccountStatus());
         System.out.println("  Locked Until: " + lockedAccount.getLockedUntil());
         System.out.println("  Failed Attempts: " + lockedAccount.getFailedPinAttempts());
         
-        // Test unlock
+
         System.out.println("\n→ Unlocking account (admin operation)...");
         accountDAO.unlockAccount(accountId);
         
@@ -420,7 +420,7 @@ public class Lab2Console {
         double amount = scanner.nextDouble();
         scanner.nextLine();
         
-        // Create a transaction
+
         System.out.println("\n→ Creating transaction...");
         org.igirerwanda.igirepaywallet.lab1.Transaction txn = 
             new org.igirerwanda.igirepaywallet.lab1.Transaction(
@@ -434,13 +434,12 @@ public class Lab2Console {
         int txnId = transactionDAO.createTransaction(txn);
         System.out.println("✓ Transaction created with ID: " + txnId + ", Status: PENDING");
         
-        // Mark as success
+
         System.out.println("\n→ Marking transaction as SUCCESS...");
         transactionDAO.markTransactionAsSuccess(txnId);
         var successTxn = transactionDAO.getTransactionById(txnId);
         System.out.println("✓ Transaction Status: " + successTxn.getStatus());
-        
-        // Create and fail another transaction
+
         System.out.println("\n→ Creating second transaction to mark as FAILED...");
         org.igirerwanda.igirepaywallet.lab1.Transaction txn2 = 
             new org.igirerwanda.igirepaywallet.lab1.Transaction(
@@ -456,7 +455,7 @@ public class Lab2Console {
         var failedTxn = transactionDAO.getTransactionById(txnId2);
         System.out.println("✓ Transaction Status: " + failedTxn.getStatus());
         
-        // Show transaction counts by status
+
         System.out.println("\n→ Transaction Status Summary:");
         System.out.println("  Pending: " + transactionDAO.getPendingTransactions(accountId).size());
         System.out.println("  Success: " + transactionDAO.getSuccessfulTransactions(accountId).size());
@@ -481,7 +480,7 @@ public class Lab2Console {
         double holdAmount = scanner.nextDouble();
         scanner.nextLine();
         
-        // Create a hold
+
         System.out.println("\n→ Creating balance hold...");
         TransactionHold hold = new TransactionHold(
             accountId,
@@ -493,7 +492,7 @@ public class Lab2Console {
         int holdId = transactionHoldDAO.createHold(hold);
         System.out.println("✓ Hold created with ID: " + holdId);
         
-        // Calculate available balance
+
         double totalHeld = transactionHoldDAO.getTotalHeldAmount(accountId);
         double availableBalance = account.getBalance() - totalHeld;
         System.out.println("\n→ Balance Calculation:");
@@ -501,7 +500,7 @@ public class Lab2Console {
         System.out.println("  Total Held: " + totalHeld + " RWF");
         System.out.println("  Available: " + availableBalance + " RWF");
         
-        // Release the hold (simulate success)
+
         System.out.println("\n→ Releasing hold (transfer success)...");
         transactionHoldDAO.releaseHold(holdId, "TRANSFER_SUCCESS");
         
@@ -524,7 +523,7 @@ public class Lab2Console {
             return;
         }
         
-        // Create audit log entries
+
         System.out.println("\n→ Creating audit log entries...");
         
         AuditLog log1 = new AuditLog(accountId, "PIN_VALIDATION", "PIN validation attempt - 3 failures", "FAILED");
@@ -539,7 +538,7 @@ public class Lab2Console {
         int logId3 = auditLogDAO.createAuditLog(log3);
         System.out.println("✓ Log 3 created: ACCOUNT_LOCKED (SUCCESS)");
         
-        // Retrieve and display logs
+
         System.out.println("\n→ Retrieving audit logs for account...");
         var logs = auditLogDAO.getAuditLogsByAccountId(accountId);
         System.out.println("✓ Found " + logs.size() + " audit log entries:");
@@ -547,7 +546,7 @@ public class Lab2Console {
             System.out.println("  - " + log.getAction() + ": " + log.getStatus() + " at " + log.getCreatedAt());
         }
         
-        // Get logs by action
+
         System.out.println("\n→ PIN_VALIDATION logs:");
         var pinLogs = auditLogDAO.getAuditLogsByAction("PIN_VALIDATION");
         System.out.println("  Total: " + pinLogs.size());
@@ -568,7 +567,7 @@ public class Lab2Console {
         
         System.out.println("\n✓ Current Status: " + account.getAccountStatus());
         
-        // Test status transitions
+
         String[] statuses = {"ACTIVE", "SUSPENDED", "DORMANT", "ACTIVE"};
         
         System.out.println("\n→ Testing status transitions...");
@@ -577,11 +576,11 @@ public class Lab2Console {
             accountDAO.updateAccountStatusField(accountId, status);
         }
         
-        // Verify final status
+
         String finalStatus = accountDAO.getAccountStatus(accountId);
         System.out.println("\n✓ Final Status: " + finalStatus);
         
-        // Get all accounts by status
+
         System.out.println("\n→ Querying all ACTIVE accounts...");
         var activeAccounts = accountDAO.getAccountsByStatus("ACTIVE");
         System.out.println("✓ Found " + activeAccounts.size() + " active accounts");

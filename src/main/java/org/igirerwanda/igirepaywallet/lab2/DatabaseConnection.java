@@ -12,22 +12,20 @@ public class DatabaseConnection {
     private static final String DB_PASSWORD = "root";
     private static final String DB_DRIVER = "org.postgresql.Driver";
 
-    // Static connection instance
+
     private static Connection connection = null;
 
     /**
-     * Get a database connection.
-     * Creates a new connection if one doesn't exist, or returns the existing one.
-     * 
+
      * @return Connection object
      * @throws SQLException if connection fails
      */
     public static Connection getConnection() throws SQLException {
         try {
-            // Load PostgreSQL driver
+
             Class.forName(DB_DRIVER);
             
-            // Create connection if not already established
+
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 System.out.println("✓ Database connection established successfully");
@@ -43,9 +41,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Close the database connection.
-     */
+
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -58,8 +54,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Test the database connection.
-     * 
+
      * @return true if connection is successful
      */
     public static boolean testConnection() {
@@ -75,9 +70,7 @@ public class DatabaseConnection {
         return false;
     }
 
-    /**
-     * Get database configuration info.
-     */
+
     public static void printDatabaseInfo() {
         System.out.println("\n--- Database Configuration ---");
         System.out.println("URL: " + DB_URL);
