@@ -101,6 +101,11 @@ CREATE TABLE audit_logs (
 -- ============================================
 -- Tracks balance holds for pending transfers
 -- Prevents double-spending during pending settlements
+-- 
+-- NEW FIELDS:
+-- - reason: Why hold was placed (TRANSFER_PENDING, WITHDRAWAL_PENDING, etc.)
+-- - release_reason: Why hold was released (TRANSFER_SUCCESS, TRANSFER_FAILED, EXPIRED, etc.)
+-- - expires_at: When hold automatically expires (default 24 hours)
 CREATE TABLE transaction_holds (
     id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
@@ -108,7 +113,10 @@ CREATE TABLE transaction_holds (
     reference_id VARCHAR(255) UNIQUE,
     hold_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     release_time TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'ACTIVE',  -- ACTIVE, RELEASED, CANCELLED
+    status VARCHAR(20) DEFAULT 'ACTIVE',  -- ACTIVE, RELEASED, EXPIRED
+    reason VARCHAR(100) NOT NULL,  -- TRANSFER_PENDING, WITHDRAWAL_PENDING, etc.
+    release_reason VARCHAR(100),  -- TRANSFER_SUCCESS, TRANSFER_FAILED, EXPIRED, etc.
+    expires_at TIMESTAMP NOT NULL,  -- Auto-release after this time
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
