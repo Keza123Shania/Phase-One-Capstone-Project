@@ -207,6 +207,262 @@ public class TransactionDAO {
         return 0;
     }
 
+    // ============================================
+    // NEW: Transaction Status Workflow Management
+    // ============================================
+
+    /**
+     * Mark a transaction as SUCCESS and record processing timestamp.
+     * Used when a PENDING transaction completes successfully.
+     * 
+     * @param transactionId The transaction ID
+     * @return true if update successful
+     */
+    public boolean markTransactionAsSuccess(int transactionId) {
+        String sql = "UPDATE transactions SET status = ?, processed_at = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "SUCCESS");
+            pstmt.setObject(2, LocalDateTime.now());
+            pstmt.setInt(3, transactionId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✓ Transaction " + transactionId + " marked as SUCCESS");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error marking transaction as success: " + e.getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
+     * Mark a transaction as FAILED with failure reason.
+     * Used when a PENDING transaction fails.
+     * 
+     * @param transactionId The transaction ID
+     * @param failureReason Reason for failure (e.g., "Insufficient balance", "Account locked")
+     * @return true if update successful
+     */
+    public boolean markTransactionAsFailed(int transactionId, String failureReason) {
+        String sql = "UPDATE transactions SET status = ?, processed_at = ?, failure_reason = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "FAILED");
+            pstmt.setObject(2, LocalDateTime.now());
+            pstmt.setString(3, failureReason);
+            pstmt.setInt(4, transactionId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✓ Transaction " + transactionId + " marked as FAILED: " + failureReason);
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error marking transaction as failed: " + e.getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
+     * Get all transactions with a specific status (SUCCESS, FAILED, PENDING).
+     * 
+     * @param status The transaction status to filter by
+     * @return List of transactions with that status
+     */
+    public List<Transaction> getTransactionsByStatus(String status) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
+                    "FROM transactions WHERE status = ? ORDER BY created_at DESC";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(buildTransactionFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving transactions by status: " + e.getMessage());
+        }
+        
+        return transactions;
+    }
+
+    /**
+     * Get pending transactions for an account (PENDING status).
+     * 
+     * @param accountId The account ID
+     * @return List of pending transactions
+     */
+    public List<Transaction> getPendingTransactions(int accountId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
+                    "FROM transactions WHERE account_id = ? AND status = 'PENDING' ORDER BY created_at DESC";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(buildTransactionFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving pending transactions: " + e.getMessage());
+        }
+        
+        return transactions;
+    }
+
+    /**
+     * Get successful transactions for an account (SUCCESS status).
+     * 
+     * @param accountId The account ID
+     * @return List of successful transactions
+     */
+    public List<Transaction> getSuccessfulTransactions(int accountId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
+                    "FROM transactions WHERE account_id = ? AND status = 'SUCCESS' ORDER BY created_at DESC";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(buildTransactionFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving successful transactions: " + e.getMessage());
+        }
+        
+        return transactions;
+    }
+
+    /**
+     * Get failed transactions for an account (FAILED status).
+     * 
+     * @param accountId The account ID
+     * @return List of failed transactions
+     */
+    public List<Transaction> getFailedTransactions(int accountId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
+                    "FROM transactions WHERE account_id = ? AND status = 'FAILED' ORDER BY created_at DESC";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(buildTransactionFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving failed transactions: " + e.getMessage());
+        }
+        
+        return transactions;
+    }
+
+    /**
+     * Get transactions within a date range for an account.
+     * 
+     * @param accountId The account ID
+     * @param startDate Start of date range
+     * @param endDate End of date range
+     * @return List of transactions in that range
+     */
+    public List<Transaction> getTransactionsByDateRange(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
+                    "FROM transactions WHERE account_id = ? AND created_at BETWEEN ? AND ? ORDER BY created_at DESC";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountId);
+            pstmt.setObject(2, startDate);
+            pstmt.setObject(3, endDate);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    transactions.add(buildTransactionFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving transactions by date range: " + e.getMessage());
+        }
+        
+        return transactions;
+    }
+
+    /**
+     * Create a rollback/reversal transaction (e.g., for failed transfer).
+     * This creates a new transaction in opposite direction to reverse a failed operation.
+     * 
+     * @param originalTransactionId The ID of the original transaction to reverse
+     * @param accountId The account ID for the reversal
+     * @param rollbackReason Reason for the rollback (e.g., "Reversal of failed transfer")
+     * @return The ID of the new rollback transaction, or -1 if failed
+     */
+    public int createRollbackTransaction(int originalTransactionId, int accountId, String rollbackReason) {
+        // First, get the original transaction
+        Transaction original = getTransactionById(originalTransactionId);
+        if (original == null) {
+            System.err.println("✗ Original transaction not found for rollback");
+            return -1;
+        }
+        
+        // Create reversal transaction (opposite amount/type)
+        String reverseType = original.getTransactionType().equals("DEPOSIT") ? "WITHDRAW" : "DEPOSIT";
+        String referenceId = original.getReferenceId() + "_ROLLBACK_" + System.currentTimeMillis();
+        String description = rollbackReason + " (Original: " + original.getReferenceId() + ")";
+        
+        Transaction rollbackTxn = new Transaction(
+            accountId,
+            referenceId,
+            reverseType,
+            original.getAmount(),
+            description
+        );
+        rollbackTxn.setStatus("SUCCESS");  // Rollback is immediately successful
+        
+        // Insert rollback transaction
+        String sql = "INSERT INTO transactions (account_id, reference_id, transaction_type, amount, created_at, status, description, reversed_by_transaction_id, rollback_reason) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, rollbackTxn.getAccountId());
+            pstmt.setString(2, rollbackTxn.getReferenceId());
+            pstmt.setString(3, reverseType);
+            pstmt.setDouble(4, rollbackTxn.getAmount());
+            pstmt.setObject(5, LocalDateTime.now());
+            pstmt.setString(6, "SUCCESS");
+            pstmt.setString(7, rollbackTxn.getDescription());
+            pstmt.setInt(8, originalTransactionId);
+            pstmt.setString(9, rollbackReason);
+            
+            pstmt.executeUpdate();
+            
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int rollbackId = rs.getInt(1);
+                    System.out.println("✓ Rollback transaction created with ID: " + rollbackId);
+                    return rollbackId;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error creating rollback transaction: " + e.getMessage());
+        }
+        
+        return -1;
+    }
+
     /**
      * Helper method to build a Transaction object from a ResultSet.
      */
