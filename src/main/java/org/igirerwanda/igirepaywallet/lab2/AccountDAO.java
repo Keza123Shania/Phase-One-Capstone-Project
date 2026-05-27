@@ -31,14 +31,19 @@ public class AccountDAO {
      * @return The generated account ID, or -1 if insertion failed
      */
     public int createAccount(Account account) {
-        String sql = "INSERT INTO accounts (customer_id, account_type, balance, created_at) " +
-                    "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO accounts (customer_id, account_type, balance, balance_on_hold, created_at, " +
+                    "failed_pin_attempts, account_status, locked_until) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, account.getCustomerId());
             pstmt.setString(2, account.getAccountType());
             pstmt.setDouble(3, account.getBalance());
-            pstmt.setObject(4, account.getCreatedAt());
+            pstmt.setDouble(4, account.getBalanceOnHold());
+            pstmt.setObject(5, account.getCreatedAt());
+            pstmt.setInt(6, account.getFailedPinAttempts());
+            pstmt.setString(7, account.getAccountStatus());
+            pstmt.setObject(8, account.getLockedUntil());
             
             pstmt.executeUpdate();
             
@@ -64,7 +69,8 @@ public class AccountDAO {
      * @return Account object, or null if not found
      */
     public Account getAccountById(int accountId) {
-        String sql = "SELECT id, customer_id, account_type, balance, created_at, is_active " +
+        String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
+                    "failed_pin_attempts, account_status, locked_until " +
                     "FROM accounts WHERE id = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -90,7 +96,8 @@ public class AccountDAO {
      */
     public List<Account> getAccountsByCustomerId(int customerId) {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT id, customer_id, account_type, balance, created_at, is_active " +
+        String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
+                    "failed_pin_attempts, account_status, locked_until " +
                     "FROM accounts WHERE customer_id = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -115,7 +122,8 @@ public class AccountDAO {
      */
     public List<Account> getAllAccounts() {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT id, customer_id, account_type, balance, created_at, is_active FROM accounts";
+        String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
+                    "failed_pin_attempts, account_status, locked_until FROM accounts";
         
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -218,23 +226,185 @@ public class AccountDAO {
         return -1;
     }
 
+    // ============================================
+    // NEW: Account Security & Status Management
+    // ============================================
+
+    /**
+     * Update balance on hold (for pending transfers).
+     */
+    public boolean updateBalanceOnHold(int accountId, double balanceOnHold) {
+        String sql = "UPDATE accounts SET balance_on_hold = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDouble(1, balanceOnHold);
+            pstmt.setInt(2, accountId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("✗ Error updating balance on hold: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Lock an account due to failed PIN attempts or fraud.
+     */
+    public boolean lockAccount(int accountId, LocalDateTime lockedUntil) {
+        String sql = "UPDATE accounts SET account_status = ?, locked_until = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "LOCKED");
+            pstmt.setObject(2, lockedUntil);
+            pstmt.setInt(3, accountId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✓ Account " + accountId + " locked");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error locking account: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Unlock an account (admin operation).
+     */
+    public boolean unlockAccount(int accountId) {
+        String sql = "UPDATE accounts SET account_status = ?, locked_until = ?, failed_pin_attempts = 0 WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "ACTIVE");
+            pstmt.setObject(2, null);
+            pstmt.setInt(3, accountId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✓ Account " + accountId + " unlocked");
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error unlocking account: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Update account account status (ACTIVE, LOCKED, SUSPENDED, DORMANT, CLOSED).
+     */
+    public boolean updateAccountStatusField(int accountId, String newStatus) {
+        String sql = "UPDATE accounts SET account_status = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, accountId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✓ Account status updated to " + newStatus);
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error updating account status: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Update failed PIN attempts counter.
+     */
+    public boolean updateFailedPinAttempts(int accountId, int attempts) {
+        String sql = "UPDATE accounts SET failed_pin_attempts = ? WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, attempts);
+            pstmt.setInt(2, accountId);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("✗ Error updating failed PIN attempts: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Get accounts by status (e.g., all LOCKED accounts).
+     */
+    public List<Account> getAccountsByStatus(String status) {
+        List<Account> accounts = new ArrayList<>();
+        String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
+                    "failed_pin_attempts, account_status, locked_until " +
+                    "FROM accounts WHERE account_status = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    accounts.add(buildAccountFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error retrieving accounts by status: " + e.getMessage());
+        }
+        return accounts;
+    }
+
+    /**
+     * Get account status for an account.
+     */
+    public String getAccountStatus(int accountId) {
+        String sql = "SELECT account_status FROM accounts WHERE id = ?";
+        
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, accountId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("account_status");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("✗ Error getting account status: " + e.getMessage());
+        }
+        return null;
+    }
+
     /**
      * Helper method to build an Account object from a ResultSet.
+     * NOW INCLUDES: PIN tracking, account status, balance holds
      */
     private Account buildAccountFromResultSet(ResultSet rs) throws SQLException {
         int accountId = rs.getInt("id");
         int customerId = rs.getInt("customer_id");
         String accountType = rs.getString("account_type");
         double balance = rs.getDouble("balance");
+        double balanceOnHold = rs.getDouble("balance_on_hold");
         LocalDateTime createdAt = rs.getObject("created_at", LocalDateTime.class);
         boolean isActive = rs.getBoolean("is_active");
+        int failedPinAttempts = rs.getInt("failed_pin_attempts");
+        String accountStatus = rs.getString("account_status");
+        LocalDateTime lockedUntil = rs.getObject("locked_until", LocalDateTime.class);
         
+        Account account = null;
         if ("WALLET".equals(accountType)) {
-            return new WalletAccount(accountId, customerId, balance, "****", createdAt, isActive);
+            account = new WalletAccount(accountId, customerId, balance, "****", createdAt, isActive);
         } else if ("SAVINGS".equals(accountType)) {
-            return new SavingsAccount(accountId, customerId, balance, "****", createdAt, isActive);
+            account = new SavingsAccount(accountId, customerId, balance, "****", createdAt, isActive);
         }
         
-        return null;
+        // Set security fields if account was created
+        if (account != null) {
+            account.setBalanceOnHold(balanceOnHold);
+            account.setFailedPinAttempts(failedPinAttempts);
+            account.setAccountStatus(accountStatus);
+            account.setLockedUntil(lockedUntil);
+        }
+        
+        return account;
     }
 }
