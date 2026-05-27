@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700" prefWidth="1000" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.igirerwanda.igirepaywallet.lab3.controllers.CustomerDashboardController">
+
+    <top>
+        <VBox styleClass="panel-header">
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 10;">
+                <Label text="My Wallet" styleClass="label-title" textFill="white" style="-fx-font-size: 20;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="customerNameLabel" textFill="white" style="-fx-font-size: 14;"/>
+                <Button text="Logout" styleClass="btn-secondary" onAction="#logout"/>
+            </HBox>
+        </VBox>
+    </top>
+
+
+    <left>
+        <VBox spacing="5" styleClass="nav-bar" style="-fx-padding: 10;">
+            <Button fx:id="dashboardBtn" text="📊 Dashboard" styleClass="nav-button" onAction="#showDashboard" prefWidth="180"/>
+            <Button fx:id="accountsBtn" text="🏦 My Accounts" styleClass="nav-button" onAction="#showAccounts" prefWidth="180"/>
+            <Button fx:id="transactionsBtn" text="💳 Transactions" styleClass="nav-button" onAction="#showTransactions" prefWidth="180"/>
+            <Button fx:id="transferBtn" text="🔄 Transfer Money" styleClass="nav-button" onAction="#showTransfers" prefWidth="180"/>
+            <Button fx:id="reportsBtn" text="📄 Statements" styleClass="nav-button" onAction="#showReports" prefWidth="180"/>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+
+    <center>
+        <StackPane fx:id="contentPane">
+            <!-- Dashboard View -->
+            <VBox fx:id="dashboardView" spacing="20" style="-fx-padding: 20;">
+                <Label text="Account Overview" styleClass="label-title"/>
+
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+                    <VBox fx:id="accountsContainer" spacing="15"/>
+                </ScrollPane>
+            </VBox>
+
+
+            <VBox fx:id="accountsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="My Accounts" styleClass="label-title"/>
+                <TableView fx:id="accountsTable" prefHeight="500">
+                    <columns>
+                        <TableColumn text="Account ID" prefWidth="80"/>
+                        <TableColumn text="Type" prefWidth="120"/>
+                        <TableColumn text="Balance" prefWidth="150"/>
+                        <TableColumn text="On Hold" prefWidth="100"/>
+                        <TableColumn text="Available" prefWidth="150"/>
+                        <TableColumn text="Status" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="transactionsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Transaction History" styleClass="label-title"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Account:" styleClass="label-info"/>
+                    <ComboBox fx:id="txnAccountCombo" promptText="Select account" prefWidth="180"/>
+                    <Button text="Deposit" styleClass="btn-primary" onAction="#createDeposit"/>
+                    <Button text="Withdraw" styleClass="btn-success" onAction="#createWithdraw"/>
+                </HBox>
+                <TableView fx:id="transactionsTable" prefHeight="400">
+                    <columns>
+                        <TableColumn text="Transaction ID" prefWidth="100"/>
+                        <TableColumn text="Type" prefWidth="80"/>
+                        <TableColumn text="Amount" prefWidth="100"/>
+                        <TableColumn text="Status" prefWidth="100"/>
+                        <TableColumn text="Date" prefWidth="150"/>
+                        <TableColumn text="Details" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="transferView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Send Money (Person to Person)" styleClass="label-title"/>
+                <Label text="Transfer from your account to any other customer's account ID." styleClass="label-info" wrapText="true"/>
+
+                <VBox styleClass="card" spacing="15">
+                    <Label text="From Your Account:" styleClass="label-subtitle"/>
+                    <ComboBox fx:id="fromAccountCombo" promptText="Select your account" prefWidth="300"/>
+
+                    <Label text="Recipient Account ID:" styleClass="label-subtitle"/>
+                    <TextField fx:id="recipientAccountIdField" promptText="Enter recipient account number" styleClass="text-field" prefWidth="300"/>
+
+                    <Label text="Amount:" styleClass="label-subtitle"/>
+                    <TextField fx:id="transferAmountField" promptText="Enter amount" styleClass="text-field"/>
+
+                    <Label text="PIN for Verification:" styleClass="label-subtitle"/>
+                    <PasswordField fx:id="transferPinField" promptText="Enter your PIN" styleClass="password-field"/>
+
+                    <HBox spacing="10">
+                        <Button text="Send Money" styleClass="btn-primary" onAction="#initiateTransfer"/>
+                        <Button text="Clear" styleClass="btn-secondary" onAction="#clearTransferForm"/>
+                    </HBox>
+
+                    <Label fx:id="transferStatusLabel" styleClass="alert-success" wrapText="true"/>
+                </VBox>
+            </VBox>
+
+
+            <VBox fx:id="reportsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Account Statements" styleClass="label-title"/>
+
+                <HBox spacing="10">
+                    <ComboBox fx:id="reportAccountCombo" promptText="Select account" prefWidth="200"/>
+                    <Button text="📥 Export to CSV" styleClass="btn-primary" onAction="#exportStatement"/>
+                    <Button text="Print" styleClass="btn-secondary" onAction="#printStatement"/>
+                </HBox>
+
+                <TextArea fx:id="statementTextArea" prefHeight="400" wrapText="true" editable="false"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #515739; -fx-padding: 10; -fx-text-fill: white;">
+            <Label fx:id="statusLabel" text="Ready" textFill="white"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="IgirePay v3.0 | Customer Portal" textFill="white" style="-fx-font-size: 11;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

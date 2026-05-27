@@ -17,9 +17,7 @@ import java.util.List;
 public class AccountDAO {
     private Connection connection;
 
-    /**
-     * Constructor - accepts a database connection.
-     */
+
     public AccountDAO(Connection connection) {
         this.connection = connection;
     }
@@ -47,7 +45,7 @@ public class AccountDAO {
             
             pstmt.executeUpdate();
             
-            // Get the generated ID
+
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int accountId = rs.getInt(1);
@@ -116,8 +114,6 @@ public class AccountDAO {
     }
 
     /**
-     * READ: Get all accounts from the database.
-     * 
      * @return List of all accounts
      */
     public List<Account> getAllAccounts() {
@@ -139,8 +135,7 @@ public class AccountDAO {
     }
 
     /**
-     * UPDATE: Update account balance.
-     * 
+
      * @param accountId The account ID
      * @param newBalance The new balance
      * @return true if update successful
@@ -166,8 +161,7 @@ public class AccountDAO {
     }
 
     /**
-     * UPDATE: Update account status (active/inactive).
-     * 
+
      * @param accountId The account ID
      * @param isActive Active status
      * @return true if update successful
@@ -193,8 +187,7 @@ public class AccountDAO {
     }
 
     /**
-     * DELETE: Delete an account (deactivate, don't actually delete for audit trail).
-     * 
+
      * @param accountId The account ID
      * @return true if deletion successful
      */
@@ -203,8 +196,7 @@ public class AccountDAO {
     }
 
     /**
-     * Custom Query: Get account balance.
-     * 
+
      * @param accountId The account ID
      * @return The current balance, or -1 if not found
      */
@@ -226,13 +218,9 @@ public class AccountDAO {
         return -1;
     }
 
-    // ============================================
-    // NEW: Account Security & Status Management
-    // ============================================
 
-    /**
-     * Update balance on hold (for pending transfers).
-     */
+
+
     public boolean updateBalanceOnHold(int accountId, double balanceOnHold) {
         String sql = "UPDATE accounts SET balance_on_hold = ? WHERE id = ?";
         
@@ -248,9 +236,7 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-     * Lock an account due to failed PIN attempts or fraud.
-     */
+
     public boolean lockAccount(int accountId, LocalDateTime lockedUntil) {
         String sql = "UPDATE accounts SET account_status = ?, locked_until = ? WHERE id = ?";
         
@@ -270,9 +256,6 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-     * Unlock an account (admin operation).
-     */
     public boolean unlockAccount(int accountId) {
         String sql = "UPDATE accounts SET account_status = ?, locked_until = ?, failed_pin_attempts = 0 WHERE id = ?";
         
@@ -292,9 +275,7 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-     * Update account account status (ACTIVE, LOCKED, SUSPENDED, DORMANT, CLOSED).
-     */
+
     public boolean updateAccountStatusField(int accountId, String newStatus) {
         String sql = "UPDATE accounts SET account_status = ? WHERE id = ?";
         
@@ -313,9 +294,7 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-     * Update failed PIN attempts counter.
-     */
+
     public boolean updateFailedPinAttempts(int accountId, int attempts) {
         String sql = "UPDATE accounts SET failed_pin_attempts = ? WHERE id = ?";
         
@@ -331,9 +310,7 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-     * Get accounts by status (e.g., all LOCKED accounts).
-     */
+
     public List<Account> getAccountsByStatus(String status) {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
@@ -354,9 +331,7 @@ public class AccountDAO {
         return accounts;
     }
 
-    /**
-     * Get account status for an account.
-     */
+
     public String getAccountStatus(int accountId) {
         String sql = "SELECT account_status FROM accounts WHERE id = ?";
         
@@ -374,10 +349,6 @@ public class AccountDAO {
         return null;
     }
 
-    /**
-     * Helper method to build an Account object from a ResultSet.
-     * NOW INCLUDES: PIN tracking, account status, balance holds
-     */
     private Account buildAccountFromResultSet(ResultSet rs) throws SQLException {
         int accountId = rs.getInt("id");
         int customerId = rs.getInt("customer_id");
@@ -397,7 +368,7 @@ public class AccountDAO {
             account = new SavingsAccount(accountId, customerId, balance, "****", createdAt, isActive);
         }
         
-        // Set security fields if account was created
+
         if (account != null) {
             account.setBalanceOnHold(balanceOnHold);
             account.setFailedPinAttempts(failedPinAttempts);

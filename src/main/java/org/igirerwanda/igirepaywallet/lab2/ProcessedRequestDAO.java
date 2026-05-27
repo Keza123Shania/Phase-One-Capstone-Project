@@ -13,19 +13,12 @@ import java.util.List;
 public class ProcessedRequestDAO {
     private Connection connection;
 
-    /**
-     * Constructor - accepts a database connection.
-     */
+
     public ProcessedRequestDAO(Connection connection) {
         this.connection = connection;
     }
 
-    /**
-     * CREATE: Mark a request as processed by storing the reference ID.
-     * 
-     * @param referenceId The unique transaction reference ID
-     * @return The generated ID, or -1 if insertion failed
-     */
+
     public int markAsProcessed(String referenceId) {
         String sql = "INSERT INTO processed_requests (reference_id, processed_at) VALUES (?, ?)";
         
@@ -51,8 +44,7 @@ public class ProcessedRequestDAO {
     }
 
     /**
-     * READ: Check if a reference ID has already been processed.
-     * 
+
      * @param referenceId The reference ID to check
      * @return true if the reference ID was already processed
      */
@@ -75,8 +67,7 @@ public class ProcessedRequestDAO {
     }
 
     /**
-     * READ: Get the processing time of a reference ID.
-     * 
+
      * @param referenceId The reference ID
      * @return LocalDateTime when it was processed, or null if not found
      */
@@ -98,11 +89,7 @@ public class ProcessedRequestDAO {
         return null;
     }
 
-    /**
-     * READ: Get all processed requests.
-     * 
-     * @return List of processed reference IDs
-     */
+
     public List<String> getAllProcessedRequests() {
         List<String> referenceIds = new ArrayList<>();
         String sql = "SELECT reference_id FROM processed_requests ORDER BY processed_at DESC";
@@ -121,8 +108,7 @@ public class ProcessedRequestDAO {
     }
 
     /**
-     * Custom Query: Get count of processed requests.
-     * 
+
      * @return Number of processed requests
      */
     public int getProcessedCount() {
@@ -142,8 +128,7 @@ public class ProcessedRequestDAO {
     }
 
     /**
-     * DELETE: Remove a processed request (use with caution).
-     * 
+
      * @param referenceId The reference ID to remove
      * @return true if deletion successful
      */

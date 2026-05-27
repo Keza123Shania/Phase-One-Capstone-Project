@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="700" prefWidth="1000" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.igirerwanda.igirepaywallet.lab3.controllers.AdminDashboardController">
+
+    <top>
+        <VBox styleClass="panel-header">
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 10;">
+                <Label text="IgirePay Admin Dashboard" styleClass="label-title" textFill="white" style="-fx-font-size: 20;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="adminNameLabel" textFill="white" style="-fx-font-size: 14;"/>
+                <Button text="Logout" styleClass="btn-secondary" onAction="#logout"/>
+            </HBox>
+        </VBox>
+    </top>
+
+
+    <left>
+        <VBox spacing="5" styleClass="nav-bar" style="-fx-padding: 10;">
+            <Button fx:id="dashboardBtn" text="📊 Dashboard" styleClass="nav-button" onAction="#showDashboard" prefWidth="180"/>
+            <Button fx:id="customersBtn" text="👥 Manage Customers" styleClass="nav-button" onAction="#showCustomers" prefWidth="180"/>
+            <Button fx:id="accountsBtn" text="🏦 View Accounts" styleClass="nav-button" onAction="#showAccounts" prefWidth="180"/>
+            <Button fx:id="transactionsBtn" text="📝 Transactions" styleClass="nav-button" onAction="#showTransactions" prefWidth="180"/>
+            <Button fx:id="auditBtn" text="🔍 Audit Trail" styleClass="nav-button" onAction="#showAuditTrail" prefWidth="180"/>
+            <Button fx:id="reportsBtn" text="📊 Reports" styleClass="nav-button" onAction="#showReports" prefWidth="180"/>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+
+    <center>
+        <StackPane fx:id="contentPane">
+            <!-- Dashboard View -->
+            <VBox fx:id="dashboardView" spacing="20" style="-fx-padding: 20;">
+                <Label text="System Overview" styleClass="label-title"/>
+
+                <HBox spacing="20">
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="10">
+                        <Label text="Total Customers" styleClass="label-subtitle" textFill="#515739"/>
+                        <Label fx:id="totalCustomersLabel" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #FD6F2F;"/>
+                    </VBox>
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="10">
+                        <Label text="Total Accounts" styleClass="label-subtitle" textFill="#515739"/>
+                        <Label fx:id="totalAccountsLabel" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #515739;"/>
+                    </VBox>
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="10">
+                        <Label text="Active Transactions" styleClass="label-subtitle" textFill="#515739"/>
+                        <Label fx:id="activeTransactionsLabel" text="0" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #FD6F2F;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="20">
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="10">
+                        <Label text="System Status" styleClass="label-subtitle" textFill="#515739"/>
+                        <Label fx:id="systemStatusLabel" text="● OPERATIONAL" style="-fx-font-size: 14; -fx-text-fill: #27AE60; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="10">
+                        <Label text="Last Sync" styleClass="label-subtitle" textFill="#515739"/>
+                        <Label fx:id="lastSyncLabel" text="Just now" style="-fx-font-size: 12; -fx-text-fill: #7F8C8D;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+
+            <VBox fx:id="customersView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Manage Customers" styleClass="label-title"/>
+                <HBox spacing="10">
+                    <TextField fx:id="newCustomerNameField" promptText="Customer Name" styleClass="text-field" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="newCustomerEmailField" promptText="Email" styleClass="text-field" HBox.hgrow="ALWAYS"/>
+                    <Button text="Add Customer" styleClass="btn-primary" onAction="#addCustomer"/>
+                </HBox>
+
+                <Label text="Existing Customers:" styleClass="label-subtitle"/>
+                <TableView fx:id="customersTable" prefHeight="400">
+                    <columns>
+                        <TableColumn text="ID" prefWidth="50"/>
+                        <TableColumn text="Name" prefWidth="150"/>
+                        <TableColumn text="Email" prefWidth="200"/>
+                        <TableColumn text="Created Date" prefWidth="150"/>
+                        <TableColumn text="Actions" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="accountsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="View All Accounts" styleClass="label-title"/>
+                <TableView fx:id="accountsTable" prefHeight="500">
+                    <columns>
+                        <TableColumn text="Account ID" prefWidth="80"/>
+                        <TableColumn text="Customer" prefWidth="150"/>
+                        <TableColumn text="Account Type" prefWidth="120"/>
+                        <TableColumn text="Balance" prefWidth="100"/>
+                        <TableColumn text="Status" prefWidth="100"/>
+                        <TableColumn text="Created Date" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="transactionsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="All Transactions" styleClass="label-title"/>
+                <TableView fx:id="transactionsTable" prefHeight="500">
+                    <columns>
+                        <TableColumn text="Transaction ID" prefWidth="100"/>
+                        <TableColumn text="Account" prefWidth="100"/>
+                        <TableColumn text="Type" prefWidth="80"/>
+                        <TableColumn text="Amount" prefWidth="100"/>
+                        <TableColumn text="Status" prefWidth="100"/>
+                        <TableColumn text="Date" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="auditView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Audit Trail - Compliance Log" styleClass="label-title"/>
+                <TableView fx:id="auditTable" prefHeight="500">
+                    <columns>
+                        <TableColumn text="Timestamp" prefWidth="150"/>
+                        <TableColumn text="Account ID" prefWidth="100"/>
+                        <TableColumn text="Action" prefWidth="150"/>
+                        <TableColumn text="Details" prefWidth="250"/>
+                        <TableColumn text="Status" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+
+            <VBox fx:id="reportsView" spacing="15" style="-fx-padding: 20;" visible="false" managed="false">
+                <Label text="Reports &amp; Analytics" styleClass="label-title"/>
+                <HBox spacing="10">
+                    <Button text="📥 Export All Transactions" styleClass="btn-primary" onAction="#exportTransactions"/>
+                    <Button text="📊 Daily Summary" styleClass="btn-primary" onAction="#generateDailySummary"/>
+                    <Button text="🔍 Reconciliation Report" styleClass="btn-success" onAction="#generateReconciliation"/>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </center>
+
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #515739; -fx-padding: 10; -fx-text-fill: white;">
+            <Label fx:id="statusLabel" text="Ready" textFill="white"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="IgirePay v3.0 | Lab 3 Integration" textFill="white" style="-fx-font-size: 11;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

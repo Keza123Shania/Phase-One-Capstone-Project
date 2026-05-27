@@ -2,17 +2,7 @@ package org.igirerwanda.igirepaywallet.lab2;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents an audit log entry for account and transaction operations.
- * Used for compliance, debugging, and security monitoring.
- * 
- * Every significant operation should create an AuditLog entry:
- * - PIN validations (success/failure)
- * - Account status changes
- * - Transaction processing
- * - Failed transactions
- * - Account lock/unlock events
- */
+
 public class AuditLog {
     private int id;
     private int accountId;
@@ -23,9 +13,7 @@ public class AuditLog {
     private String status;  // SUCCESS, FAILED, PENDING
     private LocalDateTime createdAt;
 
-    /**
-     * Constructor for creating a new audit log entry.
-     */
+
     public AuditLog(int accountId, String action, String details, String status) {
         this.accountId = accountId;
         this.action = action;
@@ -34,9 +22,7 @@ public class AuditLog {
         this.createdAt = LocalDateTime.now();
     }
 
-    /**
-     * Full constructor for all fields.
-     */
+
     public AuditLog(int id, int accountId, String action, String details, 
                    String oldValue, String newValue, String status, LocalDateTime createdAt) {
         this.id = id;
@@ -49,9 +35,7 @@ public class AuditLog {
         this.createdAt = createdAt;
     }
 
-    // ============================================
-    // Getters and Setters
-    // ============================================
+
 
     public int getId() {
         return id;

@@ -8,16 +8,12 @@ public class WalletAccount extends Account {
     private static final double MINIMUM_BALANCE = 0.0;  // Can go to zero
     private static final String ACCOUNT_TYPE = "WALLET";
 
-    /**
-     * Constructor for creating a new wallet account.
-     */
+
     public WalletAccount(int customerId, double initialBalance, String pin) {
         super(customerId, initialBalance, pin, ACCOUNT_TYPE);
     }
 
-    /**
-     * Constructor for loading from database.
-     */
+
     public WalletAccount(int accountId, int customerId, double balance, String pin,
                         LocalDateTime createdAt, boolean isActive) {
         super(accountId, customerId, balance, pin, ACCOUNT_TYPE, createdAt, isActive);
@@ -36,18 +32,18 @@ public class WalletAccount extends Account {
     public boolean withdraw(double amount, String referenceId) 
         throws DuplicateTransactionException {
         
-        // Validate amount
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be positive");
         }
 
-        // Check if sufficient balance (including fee)
+
         double totalDebit = amount + WITHDRAWAL_FEE;
         if (getBalance() < totalDebit) {
             throw new IllegalArgumentException("Insufficient balance for withdrawal");
         }
 
-        // Deduct from balance
+
         setBalance(getBalance() - totalDebit);
         return true;
     }
@@ -65,12 +61,12 @@ public class WalletAccount extends Account {
     public boolean deposit(double amount, String referenceId) 
         throws DuplicateTransactionException {
         
-        // Validate amount
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be positive");
         }
 
-        // Add to balance (no fees for deposit)
+
         setBalance(getBalance() + amount);
         return true;
     }

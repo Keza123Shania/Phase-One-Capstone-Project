@@ -15,16 +15,13 @@ import java.util.List;
 public class TransactionDAO {
     private Connection connection;
 
-    /**
-     * Constructor - accepts a database connection.
-     */
+
     public TransactionDAO(Connection connection) {
         this.connection = connection;
     }
 
     /**
-     * CREATE: Add a new transaction to the database.
-     * 
+
      * @param transaction The transaction object to insert
      * @return The generated transaction ID, or -1 if insertion failed
      */
@@ -43,7 +40,7 @@ public class TransactionDAO {
             
             pstmt.executeUpdate();
             
-            // Get the generated ID
+
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int transactionId = rs.getInt(1);
@@ -59,8 +56,7 @@ public class TransactionDAO {
     }
 
     /**
-     * READ: Get a transaction by ID.
-     * 
+
      * @param transactionId The transaction ID
      * @return Transaction object, or null if not found
      */
@@ -84,8 +80,7 @@ public class TransactionDAO {
     }
 
     /**
-     * READ: Get transaction history for a specific account.
-     * 
+
      * @param accountId The account ID
      * @return List of transactions for that account
      */
@@ -110,8 +105,7 @@ public class TransactionDAO {
     }
 
     /**
-     * READ: Get all transactions.
-     * 
+
      * @return List of all transactions
      */
     public List<Transaction> getAllTransactions() {
@@ -133,8 +127,7 @@ public class TransactionDAO {
     }
 
     /**
-     * UPDATE: Update transaction status (SUCCESS, FAILED, PENDING).
-     * 
+
      * @param transactionId The transaction ID
      * @param status The new status
      * @return true if update successful
@@ -160,8 +153,7 @@ public class TransactionDAO {
     }
 
     /**
-     * READ: Check if a reference ID exists (for duplicate detection).
-     * 
+
      * @param referenceId The reference ID to check
      * @return true if reference ID already exists
      */
@@ -184,8 +176,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Custom Query: Get transaction count for an account.
-     * 
+
      * @param accountId The account ID
      * @return Number of transactions
      */
@@ -207,14 +198,9 @@ public class TransactionDAO {
         return 0;
     }
 
-    // ============================================
-    // NEW: Transaction Status Workflow Management
-    // ============================================
 
     /**
-     * Mark a transaction as SUCCESS and record processing timestamp.
-     * Used when a PENDING transaction completes successfully.
-     * 
+
      * @param transactionId The transaction ID
      * @return true if update successful
      */
@@ -239,9 +225,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Mark a transaction as FAILED with failure reason.
-     * Used when a PENDING transaction fails.
-     * 
+
      * @param transactionId The transaction ID
      * @param failureReason Reason for failure (e.g., "Insufficient balance", "Account locked")
      * @return true if update successful
@@ -268,8 +252,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Get all transactions with a specific status (SUCCESS, FAILED, PENDING).
-     * 
+
      * @param status The transaction status to filter by
      * @return List of transactions with that status
      */
@@ -294,8 +277,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Get pending transactions for an account (PENDING status).
-     * 
+
      * @param accountId The account ID
      * @return List of pending transactions
      */
@@ -320,8 +302,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Get successful transactions for an account (SUCCESS status).
-     * 
+
      * @param accountId The account ID
      * @return List of successful transactions
      */
@@ -346,8 +327,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Get failed transactions for an account (FAILED status).
-     * 
+
      * @param accountId The account ID
      * @return List of failed transactions
      */
@@ -372,8 +352,7 @@ public class TransactionDAO {
     }
 
     /**
-     * Get transactions within a date range for an account.
-     * 
+
      * @param accountId The account ID
      * @param startDate Start of date range
      * @param endDate End of date range
@@ -402,23 +381,21 @@ public class TransactionDAO {
     }
 
     /**
-     * Create a rollback/reversal transaction (e.g., for failed transfer).
-     * This creates a new transaction in opposite direction to reverse a failed operation.
-     * 
+
      * @param originalTransactionId The ID of the original transaction to reverse
      * @param accountId The account ID for the reversal
      * @param rollbackReason Reason for the rollback (e.g., "Reversal of failed transfer")
      * @return The ID of the new rollback transaction, or -1 if failed
      */
     public int createRollbackTransaction(int originalTransactionId, int accountId, String rollbackReason) {
-        // First, get the original transaction
+
         Transaction original = getTransactionById(originalTransactionId);
         if (original == null) {
             System.err.println("✗ Original transaction not found for rollback");
             return -1;
         }
         
-        // Create reversal transaction (opposite amount/type)
+
         String reverseType = original.getTransactionType().equals("DEPOSIT") ? "WITHDRAW" : "DEPOSIT";
         String referenceId = original.getReferenceId() + "_ROLLBACK_" + System.currentTimeMillis();
         String description = rollbackReason + " (Original: " + original.getReferenceId() + ")";
@@ -432,7 +409,7 @@ public class TransactionDAO {
         );
         rollbackTxn.setStatus("SUCCESS");  // Rollback is immediately successful
         
-        // Insert rollback transaction
+
         String sql = "INSERT INTO transactions (account_id, reference_id, transaction_type, amount, created_at, status, description, reversed_by_transaction_id, rollback_reason) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
@@ -463,9 +440,7 @@ public class TransactionDAO {
         return -1;
     }
 
-    /**
-     * Helper method to build a Transaction object from a ResultSet.
-     */
+
     private Transaction buildTransactionFromResultSet(ResultSet rs) throws SQLException {
         return new Transaction(
             rs.getInt("id"),

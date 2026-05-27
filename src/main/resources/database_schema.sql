@@ -1,27 +1,15 @@
 
 
--- ============================================
--- CUSTOMERS TABLE
--- ============================================
--- Stores customer information
+
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    phone_number VARCHAR(20) NOT NULL
+    phone_number VARCHAR(20) NOT NULL,
+    pin VARCHAR(10)
 );
 
--- ============================================
--- ACCOUNTS TABLE
--- ============================================
--- Stores account information for customers
--- Can be WALLET or SAVINGS type
--- 
--- NEW FIELDS (Lab 2 Enhancements):
--- - balance_on_hold: Amount held for pending transfers
--- - failed_pin_attempts: Counter for failed PIN attempts
--- - account_status: ACTIVE, LOCKED, SUSPENDED, DORMANT, CLOSED
--- - locked_until: Timestamp when account will be unlocked
+
 CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
     customer_id INTEGER NOT NULL,
@@ -36,18 +24,6 @@ CREATE TABLE accounts (
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
--- ============================================
--- TRANSACTIONS TABLE
--- ============================================
--- Records all transaction activities
--- Types: DEPOSIT, WITHDRAW, TRANSFER_OUT, TRANSFER_IN
--- 
--- NEW FIELDS (Lab 2 Enhancements):
--- - recipient_account_id: For transfers between accounts
--- - processed_at: When transaction was settled
--- - failure_reason: Why transaction failed
--- - transfer_fee: Fee applied for transfers
--- - reversed_by_transaction_id: Link to reversal transaction
 CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
@@ -68,22 +44,14 @@ CREATE TABLE transactions (
     FOREIGN KEY (reversed_by_transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
 );
 
--- ============================================
--- PROCESSED_REQUESTS TABLE
--- ============================================
--- Tracks all processed transaction reference IDs
--- Prevents duplicate transactions from network retries
+
 CREATE TABLE processed_requests (
     id SERIAL PRIMARY KEY,
     reference_id VARCHAR(255) NOT NULL UNIQUE,
     processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================
--- AUDIT_LOGS TABLE (NEW - Lab 2 Enhancements)
--- ============================================
--- Comprehensive audit trail for compliance
--- Records: PIN validations, status changes, transactions, locks/unlocks
+
 CREATE TABLE audit_logs (
     id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
@@ -96,11 +64,7 @@ CREATE TABLE audit_logs (
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
--- ============================================
--- TRANSACTION_HOLDS TABLE (NEW - Lab 2 Phase 2)
--- ============================================
--- Tracks balance holds for pending transfers
--- Prevents double-spending during pending settlements
+
 CREATE TABLE transaction_holds (
     id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
@@ -108,14 +72,14 @@ CREATE TABLE transaction_holds (
     reference_id VARCHAR(255) UNIQUE,
     hold_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     release_time TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'ACTIVE',  -- ACTIVE, RELEASED, CANCELLED
+    status VARCHAR(20) DEFAULT 'ACTIVE',  -- ACTIVE, RELEASED, EXPIRED
+    reason VARCHAR(100) NOT NULL,  -- TRANSFER_PENDING, WITHDRAWAL_PENDING, etc.
+    release_reason VARCHAR(100),  -- TRANSFER_SUCCESS, TRANSFER_FAILED, EXPIRED, etc.
+    expires_at TIMESTAMP NOT NULL,  -- Auto-release after this time
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
--- ============================================
--- DAILY_BALANCE_SNAPSHOTS TABLE (NEW - Lab 2 Phase 3)
--- ============================================
--- Daily snapshots for reconciliation and audit
+
 CREATE TABLE daily_balance_snapshots (
     id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL,
@@ -130,9 +94,7 @@ CREATE TABLE daily_balance_snapshots (
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 );
 
--- ============================================
--- INDEXES (for performance)
--- ============================================
+
 CREATE INDEX idx_accounts_customer_id ON accounts(customer_id);
 CREATE INDEX idx_accounts_account_status ON accounts(account_status);
 CREATE INDEX idx_transactions_account_id ON transactions(account_id);

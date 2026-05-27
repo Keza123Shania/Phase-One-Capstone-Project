@@ -14,27 +14,29 @@ import java.util.List;
 public class CustomerDAO {
     private Connection connection;
 
-    /**
-     * Constructor - accepts a database connection.
-     */
+
     public CustomerDAO(Connection connection) {
         this.connection = connection;
     }
 
     /**
-     * CREATE: Add a new customer to the database.
-     * 
+
      * @param customer The customer object to insert
      * @return The generated customer ID, or -1 if insertion failed
      */
     public int createCustomer(Customer customer) {
-        String sql = "INSERT INTO customers (full_name, email, phone_number) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO customers (full_name, email, phone_number, pin) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             // Use ? placeholders to prevent SQL injection
             pstmt.setString(1, customer.getFullName());
             pstmt.setString(2, customer.getEmail());
             pstmt.setString(3, customer.getPhoneNumber());
+            String pin = customer.getPin();
+            if (pin == null || pin.isBlank()) {
+                pin = "1234";
+            }
+            pstmt.setString(4, pin);
             
             pstmt.executeUpdate();
             
@@ -54,13 +56,12 @@ public class CustomerDAO {
     }
 
     /**
-     * READ: Get a customer by ID.
-     * 
+
      * @param customerId The customer ID
      * @return Customer object, or null if not found
      */
     public Customer getCustomerById(int customerId) {
-        String sql = "SELECT id, full_name, email, phone_number FROM customers WHERE id = ?";
+        String sql = "SELECT id, full_name, email, phone_number, pin FROM customers WHERE id = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, customerId);
@@ -71,7 +72,8 @@ public class CustomerDAO {
                         rs.getInt("id"),
                         rs.getString("full_name"),
                         rs.getString("email"),
-                        rs.getString("phone_number")
+                        rs.getString("phone_number"),
+                        rs.getString("pin")
                     );
                 }
             }
@@ -83,13 +85,12 @@ public class CustomerDAO {
     }
 
     /**
-     * READ: Get all customers from the database.
-     * 
+
      * @return List of all customers
      */
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
-        String sql = "SELECT id, full_name, email, phone_number FROM customers";
+        String sql = "SELECT id, full_name, email, phone_number, pin FROM customers";
         
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -99,7 +100,8 @@ public class CustomerDAO {
                     rs.getInt("id"),
                     rs.getString("full_name"),
                     rs.getString("email"),
-                    rs.getString("phone_number")
+                    rs.getString("phone_number"),
+                    rs.getString("pin")
                 );
                 customers.add(customer);
             }
@@ -111,19 +113,23 @@ public class CustomerDAO {
     }
 
     /**
-     * UPDATE: Update customer details.
-     * 
+
      * @param customer The customer with updated information
      * @return true if update successful
      */
     public boolean updateCustomer(Customer customer) {
-        String sql = "UPDATE customers SET full_name = ?, email = ?, phone_number = ? WHERE id = ?";
+        String sql = "UPDATE customers SET full_name = ?, email = ?, phone_number = ?, pin = ? WHERE id = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, customer.getFullName());
             pstmt.setString(2, customer.getEmail());
             pstmt.setString(3, customer.getPhoneNumber());
-            pstmt.setInt(4, customer.getId());
+            String pin = customer.getPin();
+            if (pin == null || pin.isBlank()) {
+                pin = "1234";
+            }
+            pstmt.setString(4, pin);
+            pstmt.setInt(5, customer.getId());
             
             int rowsAffected = pstmt.executeUpdate();
             
@@ -138,9 +144,21 @@ public class CustomerDAO {
         return false;
     }
 
+
+    public boolean updateCustomerPin(int customerId, String pin) {
+        String sql = "UPDATE customers SET pin = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, pin);
+            pstmt.setInt(2, customerId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("✗ Error updating customer PIN: " + e.getMessage());
+            return false;
+        }
+    }
+
     /**
-     * DELETE: Delete a customer by ID.
-     * 
+
      * @param customerId The customer ID to delete
      * @return true if deletion successful
      */
@@ -164,8 +182,7 @@ public class CustomerDAO {
     }
 
     /**
-     * Custom Query: Get count of all customers.
-     * 
+
      * @return Number of customers in database
      */
     public int getCustomerCount() {
