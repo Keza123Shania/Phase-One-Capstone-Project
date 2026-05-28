@@ -39,7 +39,7 @@ public class HelloApplication extends Application {
 
             try {
                 int choice = scanner.nextInt();
-                scanner.nextLine();  // Consume newline
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1:
@@ -64,7 +64,7 @@ public class HelloApplication extends Application {
                 }
             } catch (Exception e) {
                 System.out.println("\n✗ Invalid input. Please enter a number between 0 and 4.");
-                scanner.nextLine();  // Clear invalid input
+                scanner.nextLine();
             }
         }
 

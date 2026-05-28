@@ -155,7 +155,6 @@ public class AdminService {
                 return -1;
             }
 
-            // NOTE: PIN is validated at customer level; accounts don't persist PIN.
             Account account = "WALLET".equals(type)
                     ? new WalletAccount(customerId, initialBalance, "0000")
                     : new SavingsAccount(customerId, initialBalance, "0000");
@@ -216,10 +215,8 @@ public class AdminService {
             String fileName = "transactions_" + System.currentTimeMillis() + ".csv";
             FileWriter csvWriter = new FileWriter(fileName);
 
-            // Write header
             csvWriter.append("Transaction ID,Account ID,Type,Amount,Status,Reference ID,Date\n");
 
-            // Write data rows
             for (Transaction txn : transactions) {
                 csvWriter.append(String.valueOf(txn.getTransactionId()))
                     .append(",").append(String.valueOf(txn.getAccountId()))
@@ -255,7 +252,6 @@ public class AdminService {
             summary.append("=== Daily Transaction Summary ===\n");
             summary.append("Date: ").append(today.format(formatter)).append("\n\n");
 
-            // Get all transactions
             List<Transaction> allTransactions = transactionDAO.getAllTransactions();
             if (allTransactions == null) {
                 allTransactions = new java.util.ArrayList<>();
@@ -298,9 +294,6 @@ public class AdminService {
         }
     }
 
-    /**
-     * Generate reconciliation report
-     */
     public String generateReconciliation() {
         try {
             List<Account> accounts = accountDAO.getAllAccounts();
@@ -335,7 +328,6 @@ public class AdminService {
 
     public String getSystemStatus() {
         try {
-            // Test database connection
             if (connection != null && !connection.isClosed()) {
                 return "OPERATIONAL";
             }

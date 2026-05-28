@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 public class AuditLog {
     private int id;
     private int accountId;
-    private String action;  // e.g., "PIN_VALIDATION", "TRANSACTION_DEPOSIT", "ACCOUNT_LOCKED"
-    private String details;  // Descriptive details of the action
-    private String oldValue;  // Previous state (for status changes)
-    private String newValue;  // New state (for status changes)
-    private String status;  // SUCCESS, FAILED, PENDING
+    private String action;
+    private String details;
+    private String oldValue;
+    private String newValue;
+    private String status;
     private LocalDateTime createdAt;
 
 

@@ -14,12 +14,6 @@ public class AuditLogDAO {
         this.connection = connection;
     }
 
-    /**
-     * Create a new audit log entry.
-     * 
-     * @param auditLog The audit log to create
-     * @return The generated audit log ID
-     */
     public int createAuditLog(AuditLog auditLog) {
         String sql = "INSERT INTO audit_logs (account_id, action, details, old_value, new_value, status, created_at) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";

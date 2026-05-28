@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 public class TransactionHold {
     private int id;
     private int accountId;
-    private double amount;                  // Amount on hold
-    private String referenceId;             // Link to transaction or transfer ID
-    private LocalDateTime holdTime;         // When hold was created
-    private LocalDateTime releaseTime;      // When hold was released (null if active)
-    private String status;                  // ACTIVE, RELEASED, EXPIRED
-    private String reason;                  // Why hold was placed (e.g., "TRANSFER_PENDING", "WITHDRAWAL_PENDING")
-    private String releaseReason;           // Why hold was released (e.g., "TRANSFER_SUCCESS", "TRANSFER_FAILED")
-    private LocalDateTime expiresAt;        // When hold expires (auto-release if no action)
+    private double amount;
+    private String referenceId;
+    private LocalDateTime holdTime;
+    private LocalDateTime releaseTime;
+    private String status;
+    private String reason;
+    private String releaseReason;
+    private LocalDateTime expiresAt;
 
 
     public TransactionHold(int accountId, double amount, String referenceId, String reason) {

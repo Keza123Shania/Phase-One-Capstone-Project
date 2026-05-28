@@ -41,7 +41,7 @@ public class LoginController {
     @FXML
     public void initialize() {
         authService = new AuthService();
-        setCustomerRole();  // Default to customer role
+        setCustomerRole();
     }
 
     public void setStage(Stage stage) {

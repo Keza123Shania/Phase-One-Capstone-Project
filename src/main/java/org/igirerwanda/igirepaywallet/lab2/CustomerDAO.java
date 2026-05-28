@@ -19,16 +19,10 @@ public class CustomerDAO {
         this.connection = connection;
     }
 
-    /**
-
-     * @param customer The customer object to insert
-     * @return The generated customer ID, or -1 if insertion failed
-     */
     public int createCustomer(Customer customer) {
         String sql = "INSERT INTO customers (full_name, email, phone_number, pin) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            // Use ? placeholders to prevent SQL injection
             pstmt.setString(1, customer.getFullName());
             pstmt.setString(2, customer.getEmail());
             pstmt.setString(3, customer.getPhoneNumber());
@@ -39,8 +33,6 @@ public class CustomerDAO {
             pstmt.setString(4, pin);
             
             pstmt.executeUpdate();
-            
-            // Get the generated ID
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int customerId = rs.getInt(1);
@@ -55,11 +47,6 @@ public class CustomerDAO {
         return -1;
     }
 
-    /**
-
-     * @param customerId The customer ID
-     * @return Customer object, or null if not found
-     */
     public Customer getCustomerById(int customerId) {
         String sql = "SELECT id, full_name, email, phone_number, pin FROM customers WHERE id = ?";
         
@@ -84,10 +71,6 @@ public class CustomerDAO {
         return null;
     }
 
-    /**
-
-     * @return List of all customers
-     */
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT id, full_name, email, phone_number, pin FROM customers";
@@ -112,11 +95,6 @@ public class CustomerDAO {
         return customers;
     }
 
-    /**
-
-     * @param customer The customer with updated information
-     * @return true if update successful
-     */
     public boolean updateCustomer(Customer customer) {
         String sql = "UPDATE customers SET full_name = ?, email = ?, phone_number = ?, pin = ? WHERE id = ?";
         
@@ -157,11 +135,6 @@ public class CustomerDAO {
         }
     }
 
-    /**
-
-     * @param customerId The customer ID to delete
-     * @return true if deletion successful
-     */
     public boolean deleteCustomer(int customerId) {
         String sql = "DELETE FROM customers WHERE id = ?";
         
@@ -181,10 +154,6 @@ public class CustomerDAO {
         return false;
     }
 
-    /**
-
-     * @return Number of customers in database
-     */
     public int getCustomerCount() {
         String sql = "SELECT COUNT(*) as count FROM customers";
         

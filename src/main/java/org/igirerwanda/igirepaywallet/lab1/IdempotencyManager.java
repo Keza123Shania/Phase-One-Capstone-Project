@@ -12,12 +12,6 @@ public class IdempotencyManager {
         this.processedReferenceIds = new HashSet<>();
     }
 
-    /**
-     * Check if a reference ID has already been processed.
-     * 
-     * @param referenceId The unique transaction reference ID
-     * @return true if already processed, false if new
-     */
     public boolean isDuplicate(String referenceId) {
         if (referenceId == null || referenceId.trim().isEmpty()) {
             throw new IllegalArgumentException("Reference ID cannot be null or empty");
@@ -25,12 +19,6 @@ public class IdempotencyManager {
         return processedReferenceIds.contains(referenceId);
     }
 
-    /**
-     * Mark a reference ID as processed.
-     * 
-     * @param referenceId The unique transaction reference ID
-     * @throws DuplicateTransactionException if already processed
-     */
     public void markAsProcessed(String referenceId) throws DuplicateTransactionException {
         if (referenceId == null || referenceId.trim().isEmpty()) {
             throw new IllegalArgumentException("Reference ID cannot be null or empty");

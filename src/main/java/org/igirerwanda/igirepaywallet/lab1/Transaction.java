@@ -7,11 +7,11 @@ public class Transaction {
     private int transactionId;
     private int accountId;
     private String referenceId;
-    private String transactionType;  // DEPOSIT, WITHDRAW, TRANSFER
+    private String transactionType;
     private double amount;
     private LocalDateTime timestamp;
-    private String status;  // SUCCESS, FAILED, PENDING
-    private String description;  // Optional notes about the transaction
+    private String status;
+    private String description;
 
 
     public Transaction(int accountId, String referenceId, String transactionType, 

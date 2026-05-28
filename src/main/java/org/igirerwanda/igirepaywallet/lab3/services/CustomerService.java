@@ -158,7 +158,6 @@ public class CustomerService {
 
     public boolean completeTransfer(int holdId, String pin) {
         try {
-            // Get hold details
             TransactionHold hold = holdDAO.getHoldById(holdId);
             if (hold == null) {
                 System.out.println("❌ Hold not found");
@@ -485,9 +484,6 @@ public class CustomerService {
         }
     }
 
-    /**
-     * Close database connection
-     */
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {

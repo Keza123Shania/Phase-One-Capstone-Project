@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 
 public class WalletAccount extends Account {
-    private static final double WITHDRAWAL_FEE = 0.0;  // No withdrawal fee for wallet
-    private static final double MINIMUM_BALANCE = 0.0;  // Can go to zero
+    private static final double WITHDRAWAL_FEE = 0.0;
+    private static final double MINIMUM_BALANCE = 0.0;  
     private static final String ACCOUNT_TYPE = "WALLET";
 
 
@@ -19,15 +19,6 @@ public class WalletAccount extends Account {
         super(accountId, customerId, balance, pin, ACCOUNT_TYPE, createdAt, isActive);
     }
 
-    /**
-     * Withdraw money from wallet account.
-     * Wallet allows instant withdrawal with no minimum balance requirement.
-     * 
-     * @param amount The amount to withdraw
-     * @param referenceId Unique transaction ID for idempotency
-     * @return true if withdrawal successful
-     * @throws DuplicateTransactionException if referenceId was already processed
-     */
     @Override
     public boolean withdraw(double amount, String referenceId) 
         throws DuplicateTransactionException {
@@ -48,15 +39,6 @@ public class WalletAccount extends Account {
         return true;
     }
 
-    /**
-     * Deposit money into wallet account.
-     * Wallet allows instant deposits.
-     * 
-     * @param amount The amount to deposit
-     * @param referenceId Unique transaction ID for idempotency
-     * @return true if deposit successful
-     * @throws DuplicateTransactionException if referenceId was already processed
-     */
     @Override
     public boolean deposit(double amount, String referenceId) 
         throws DuplicateTransactionException {
@@ -71,16 +53,6 @@ public class WalletAccount extends Account {
         return true;
     }
 
-    /**
-     * Process a generic transaction (DEPOSIT, WITHDRAW, TRANSFER).
-     * Routes to appropriate method based on transaction type.
-     * 
-     * @param transactionType Type of transaction
-     * @param amount Amount to process
-     * @param referenceId Unique transaction ID
-     * @return true if transaction successful
-     * @throws DuplicateTransactionException if referenceId already processed
-     */
     @Override
     public boolean processTransaction(String transactionType, double amount, 
                                      String referenceId) 
@@ -96,7 +68,6 @@ public class WalletAccount extends Account {
             case "WITHDRAW":
                 return withdraw(amount, referenceId);
             case "TRANSFER":
-                // Transfer is essentially a withdrawal from this account
                 return withdraw(amount, referenceId);
             default:
                 throw new IllegalArgumentException("Unknown transaction type: " + transactionType);
