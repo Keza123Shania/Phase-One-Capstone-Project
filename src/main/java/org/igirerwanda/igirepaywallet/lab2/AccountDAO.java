@@ -22,12 +22,6 @@ public class AccountDAO {
         this.connection = connection;
     }
 
-    /**
-     * CREATE: Add a new account to the database.
-     * 
-     * @param account The account object to insert
-     * @return The generated account ID, or -1 if insertion failed
-     */
     public int createAccount(Account account) {
         String sql = "INSERT INTO accounts (customer_id, account_type, balance, balance_on_hold, created_at, " +
                     "failed_pin_attempts, account_status, locked_until) " +
@@ -44,8 +38,6 @@ public class AccountDAO {
             pstmt.setObject(8, account.getLockedUntil());
             
             pstmt.executeUpdate();
-            
-
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int accountId = rs.getInt(1);
@@ -60,12 +52,6 @@ public class AccountDAO {
         return -1;
     }
 
-    /**
-     * READ: Get an account by ID.
-     * 
-     * @param accountId The account ID
-     * @return Account object, or null if not found
-     */
     public Account getAccountById(int accountId) {
         String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
                     "failed_pin_attempts, account_status, locked_until " +
@@ -86,12 +72,6 @@ public class AccountDAO {
         return null;
     }
 
-    /**
-     * READ: Get all accounts for a specific customer.
-     * 
-     * @param customerId The customer ID
-     * @return List of accounts for that customer
-     */
     public List<Account> getAccountsByCustomerId(int customerId) {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
@@ -113,9 +93,6 @@ public class AccountDAO {
         return accounts;
     }
 
-    /**
-     * @return List of all accounts
-     */
     public List<Account> getAllAccounts() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT id, customer_id, account_type, balance, balance_on_hold, created_at, is_active, " +
@@ -134,12 +111,6 @@ public class AccountDAO {
         return accounts;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @param newBalance The new balance
-     * @return true if update successful
-     */
     public boolean updateBalance(int accountId, double newBalance) {
         String sql = "UPDATE accounts SET balance = ? WHERE id = ?";
         
@@ -160,12 +131,6 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @param isActive Active status
-     * @return true if update successful
-     */
     public boolean updateAccountStatus(int accountId, boolean isActive) {
         String sql = "UPDATE accounts SET is_active = ? WHERE id = ?";
         
@@ -186,20 +151,10 @@ public class AccountDAO {
         return false;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return true if deletion successful
-     */
     public boolean deleteAccount(int accountId) {
         return updateAccountStatus(accountId, false);
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return The current balance, or -1 if not found
-     */
     public double getBalance(int accountId) {
         String sql = "SELECT balance FROM accounts WHERE id = ?";
         

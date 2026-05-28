@@ -28,7 +28,6 @@ public class ProcessedRequestDAO {
             
             pstmt.executeUpdate();
             
-            // Get the generated ID
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
@@ -43,11 +42,6 @@ public class ProcessedRequestDAO {
         return -1;
     }
 
-    /**
-
-     * @param referenceId The reference ID to check
-     * @return true if the reference ID was already processed
-     */
     public boolean isProcessed(String referenceId) {
         String sql = "SELECT COUNT(*) as count FROM processed_requests WHERE reference_id = ?";
         
@@ -66,11 +60,6 @@ public class ProcessedRequestDAO {
         return false;
     }
 
-    /**
-
-     * @param referenceId The reference ID
-     * @return LocalDateTime when it was processed, or null if not found
-     */
     public LocalDateTime getProcessingTime(String referenceId) {
         String sql = "SELECT processed_at FROM processed_requests WHERE reference_id = ?";
         
@@ -107,10 +96,6 @@ public class ProcessedRequestDAO {
         return referenceIds;
     }
 
-    /**
-
-     * @return Number of processed requests
-     */
     public int getProcessedCount() {
         String sql = "SELECT COUNT(*) as count FROM processed_requests";
         
@@ -127,11 +112,6 @@ public class ProcessedRequestDAO {
         return 0;
     }
 
-    /**
-
-     * @param referenceId The reference ID to remove
-     * @return true if deletion successful
-     */
     public boolean deleteProcessedRequest(String referenceId) {
         String sql = "DELETE FROM processed_requests WHERE reference_id = ?";
         

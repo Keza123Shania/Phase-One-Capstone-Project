@@ -23,7 +23,6 @@ public class Lab2Console {
         System.out.println("║  IgirePay Lab 2: Database Integration  ║");
         System.out.println("╚════════════════════════════════════════╝");
 
-        // Test database connection
         if (!testDatabaseConnection()) {
             System.out.println("\n✗ Cannot proceed without database connection.");
             System.out.println("\nDatabase Setup Instructions:");

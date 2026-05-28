@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 
 public class SavingsAccount extends Account {
-    private static final double WITHDRAWAL_FEE_PERCENTAGE = 0.01;  // 1% withdrawal fee
-    private static final double MINIMUM_SAVINGS_BALANCE = 10000.0;  // Minimum balance required
+    private static final double WITHDRAWAL_FEE_PERCENTAGE = 0.01;
+    private static final double MINIMUM_SAVINGS_BALANCE = 10000.0;
     private static final String ACCOUNT_TYPE = "SAVINGS";
 
 
@@ -19,15 +19,6 @@ public class SavingsAccount extends Account {
         super(accountId, customerId, balance, pin, ACCOUNT_TYPE, createdAt, isActive);
     }
 
-    /**
-     * Withdraw money from savings account.
-     * Savings account charges 1% fee and enforces minimum balance.
-     *
-     * @param amount The amount to withdraw
-     * @param referenceId Unique transaction ID for idempotency
-     * @return true if withdrawal successful
-     * @throws DuplicateTransactionException if referenceId was already processed
-     */
     @Override
     public boolean withdraw(double amount, String referenceId) 
         throws DuplicateTransactionException {
@@ -55,20 +46,10 @@ public class SavingsAccount extends Account {
             );
         }
 
-        // Deduct from balance
         setBalance(balanceAfterWithdrawal);
         return true;
     }
 
-    /**
-     * Deposit money into savings account.
-     * Savings account allows free deposits to encourage saving.
-     * 
-     * @param amount The amount to deposit
-     * @param referenceId Unique transaction ID for idempotency
-     * @return true if deposit successful
-     * @throws DuplicateTransactionException if referenceId was already processed
-     */
     @Override
     public boolean deposit(double amount, String referenceId) 
         throws DuplicateTransactionException {
@@ -83,16 +64,6 @@ public class SavingsAccount extends Account {
         return true;
     }
 
-    /**
-     * Process a generic transaction (DEPOSIT, WITHDRAW, TRANSFER).
-     * Routes to appropriate method based on transaction type.
-     * 
-     * @param transactionType Type of transaction
-     * @param amount Amount to process
-     * @param referenceId Unique transaction ID
-     * @return true if transaction successful
-     * @throws DuplicateTransactionException if referenceId already processed
-     */
     @Override
     public boolean processTransaction(String transactionType, double amount, 
                                      String referenceId) 
@@ -108,7 +79,6 @@ public class SavingsAccount extends Account {
             case "WITHDRAW":
                 return withdraw(amount, referenceId);
             case "TRANSFER":
-                // Transfer from savings charges the withdrawal fee
                 return withdraw(amount, referenceId);
             default:
                 throw new IllegalArgumentException("Unknown transaction type: " + transactionType);
@@ -122,7 +92,7 @@ public class SavingsAccount extends Account {
 
 
     public double getWithdrawalFeePercentage() {
-        return WITHDRAWAL_FEE_PERCENTAGE * 100;  // Return as percentage (e.g., 1.0 for 1%)
+        return WITHDRAWAL_FEE_PERCENTAGE * 100;
     }
 
     @Override

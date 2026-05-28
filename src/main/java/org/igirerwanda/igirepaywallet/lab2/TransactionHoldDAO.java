@@ -19,11 +19,6 @@ public class TransactionHoldDAO {
         this.connection = connection;
     }
 
-    /**
-
-     * @param hold The TransactionHold object to insert
-     * @return The generated hold ID, or -1 if insertion failed
-     */
     public int createHold(TransactionHold hold) {
         String sql = "INSERT INTO transaction_holds (account_id, amount, reference_id, hold_time, status, reason, expires_at) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -53,11 +48,6 @@ public class TransactionHoldDAO {
         return -1;
     }
 
-    /**
-
-     * @param holdId The hold ID
-     * @return TransactionHold object, or null if not found
-     */
     public TransactionHold getHoldById(int holdId) {
         String sql = "SELECT id, account_id, amount, reference_id, hold_time, release_time, status, reason, release_reason, expires_at " +
                     "FROM transaction_holds WHERE id = ?";
@@ -77,11 +67,6 @@ public class TransactionHoldDAO {
         return null;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of active holds on that account
-     */
     public List<TransactionHold> getActiveHolds(int accountId) {
         List<TransactionHold> holds = new ArrayList<>();
         String sql = "SELECT id, account_id, amount, reference_id, hold_time, release_time, status, reason, release_reason, expires_at " +
@@ -102,11 +87,6 @@ public class TransactionHoldDAO {
         return holds;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return Sum of all active holds
-     */
     public double getTotalHeldAmount(int accountId) {
         String sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transaction_holds WHERE account_id = ? AND status = 'ACTIVE'";
         
@@ -125,12 +105,6 @@ public class TransactionHoldDAO {
         return 0.0;
     }
 
-    /**
-
-     * @param holdId The hold ID
-     * @param releaseReason Reason for release (e.g., "TRANSFER_SUCCESS", "TRANSFER_FAILED")
-     * @return true if update successful
-     */
     public boolean releaseHold(int holdId, String releaseReason) {
         String sql = "UPDATE transaction_holds SET status = ?, release_time = ?, release_reason = ? WHERE id = ?";
         
@@ -152,13 +126,6 @@ public class TransactionHoldDAO {
         return false;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @param referenceIds List of reference IDs to release
-     * @param releaseReason Reason for release
-     * @return Number of holds released
-     */
     public int releaseHoldsByReference(int accountId, List<String> referenceIds, String releaseReason) {
         int released = 0;
         
@@ -185,11 +152,6 @@ public class TransactionHoldDAO {
         return released;
     }
 
-    /**
-
-     * @param holdId The hold ID
-     * @return true if delete successful
-     */
     public boolean deleteHold(int holdId) {
         String sql = "DELETE FROM transaction_holds WHERE id = ?";
         
@@ -208,11 +170,6 @@ public class TransactionHoldDAO {
         return false;
     }
 
-    /**
-
-     * @param referenceId The reference ID (transfer ID)
-     * @return TransactionHold, or null if not found
-     */
     public TransactionHold getHoldByReference(String referenceId) {
         String sql = "SELECT id, account_id, amount, reference_id, hold_time, release_time, status, reason, release_reason, expires_at " +
                     "FROM transaction_holds WHERE reference_id = ?";
@@ -232,11 +189,6 @@ public class TransactionHoldDAO {
         return null;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of all holds for that account
-     */
     public List<TransactionHold> getAllHoldsForAccount(int accountId) {
         List<TransactionHold> holds = new ArrayList<>();
         String sql = "SELECT id, account_id, amount, reference_id, hold_time, release_time, status, reason, release_reason, expires_at " +

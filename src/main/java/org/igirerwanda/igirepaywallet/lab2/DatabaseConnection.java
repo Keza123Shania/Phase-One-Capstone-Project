@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 
 public class DatabaseConnection {
-    // Database connection details
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/igirepay_db";
     private static final String DB_USER = "postgres";
     private static final String DB_PASSWORD = "root";
@@ -15,11 +14,6 @@ public class DatabaseConnection {
 
     private static Connection connection = null;
 
-    /**
-
-     * @return Connection object
-     * @throws SQLException if connection fails
-     */
     public static Connection getConnection() throws SQLException {
         try {
 
@@ -53,10 +47,6 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-
-     * @return true if connection is successful
-     */
     public static boolean testConnection() {
         try {
             Connection conn = getConnection();

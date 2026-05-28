@@ -20,11 +20,6 @@ public class TransactionDAO {
         this.connection = connection;
     }
 
-    /**
-
-     * @param transaction The transaction object to insert
-     * @return The generated transaction ID, or -1 if insertion failed
-     */
     public int createTransaction(Transaction transaction) {
         String sql = "INSERT INTO transactions (account_id, reference_id, transaction_type, amount, created_at, status, description) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -55,11 +50,6 @@ public class TransactionDAO {
         return -1;
     }
 
-    /**
-
-     * @param transactionId The transaction ID
-     * @return Transaction object, or null if not found
-     */
     public Transaction getTransactionById(int transactionId) {
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
                     "FROM transactions WHERE id = ?";
@@ -79,11 +69,6 @@ public class TransactionDAO {
         return null;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of transactions for that account
-     */
     public List<Transaction> getTransactionsByAccountId(int accountId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -104,10 +89,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @return List of all transactions
-     */
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -126,12 +107,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param transactionId The transaction ID
-     * @param status The new status
-     * @return true if update successful
-     */
     public boolean updateTransactionStatus(int transactionId, String status) {
         String sql = "UPDATE transactions SET status = ? WHERE id = ?";
         
@@ -152,11 +127,6 @@ public class TransactionDAO {
         return false;
     }
 
-    /**
-
-     * @param referenceId The reference ID to check
-     * @return true if reference ID already exists
-     */
     public boolean referenceIdExists(String referenceId) {
         String sql = "SELECT COUNT(*) as count FROM transactions WHERE reference_id = ?";
         
@@ -175,11 +145,6 @@ public class TransactionDAO {
         return false;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return Number of transactions
-     */
     public int getTransactionCount(int accountId) {
         String sql = "SELECT COUNT(*) as count FROM transactions WHERE account_id = ?";
         
@@ -199,11 +164,6 @@ public class TransactionDAO {
     }
 
 
-    /**
-
-     * @param transactionId The transaction ID
-     * @return true if update successful
-     */
     public boolean markTransactionAsSuccess(int transactionId) {
         String sql = "UPDATE transactions SET status = ?, processed_at = ? WHERE id = ?";
         
@@ -224,12 +184,6 @@ public class TransactionDAO {
         return false;
     }
 
-    /**
-
-     * @param transactionId The transaction ID
-     * @param failureReason Reason for failure (e.g., "Insufficient balance", "Account locked")
-     * @return true if update successful
-     */
     public boolean markTransactionAsFailed(int transactionId, String failureReason) {
         String sql = "UPDATE transactions SET status = ?, processed_at = ?, failure_reason = ? WHERE id = ?";
         
@@ -251,11 +205,6 @@ public class TransactionDAO {
         return false;
     }
 
-    /**
-
-     * @param status The transaction status to filter by
-     * @return List of transactions with that status
-     */
     public List<Transaction> getTransactionsByStatus(String status) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -276,11 +225,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of pending transactions
-     */
     public List<Transaction> getPendingTransactions(int accountId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -301,11 +245,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of successful transactions
-     */
     public List<Transaction> getSuccessfulTransactions(int accountId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -326,11 +265,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @return List of failed transactions
-     */
     public List<Transaction> getFailedTransactions(int accountId) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -351,13 +285,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param accountId The account ID
-     * @param startDate Start of date range
-     * @param endDate End of date range
-     * @return List of transactions in that range
-     */
     public List<Transaction> getTransactionsByDateRange(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT id, account_id, reference_id, transaction_type, amount, created_at, status, description " +
@@ -380,13 +307,6 @@ public class TransactionDAO {
         return transactions;
     }
 
-    /**
-
-     * @param originalTransactionId The ID of the original transaction to reverse
-     * @param accountId The account ID for the reversal
-     * @param rollbackReason Reason for the rollback (e.g., "Reversal of failed transfer")
-     * @return The ID of the new rollback transaction, or -1 if failed
-     */
     public int createRollbackTransaction(int originalTransactionId, int accountId, String rollbackReason) {
 
         Transaction original = getTransactionById(originalTransactionId);
@@ -407,7 +327,7 @@ public class TransactionDAO {
             original.getAmount(),
             description
         );
-        rollbackTxn.setStatus("SUCCESS");  // Rollback is immediately successful
+        rollbackTxn.setStatus("SUCCESS");
         
 
         String sql = "INSERT INTO transactions (account_id, reference_id, transaction_type, amount, created_at, status, description, reversed_by_transaction_id, rollback_reason) " +

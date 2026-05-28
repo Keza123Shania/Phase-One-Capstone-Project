@@ -92,15 +92,6 @@ public abstract class Account {
         return this.pin.equals(enteredPin);
     }
 
-    /**
-     * Validate PIN with attempt tracking and account locking.
-     * This is the production-grade method that should be used in real transactions.
-     * 
-     * @param enteredPin The PIN entered by user
-     * @return true if PIN is correct
-     * @throws AccountLockedException if account is locked or will be locked after this attempt
-     * @throws AccountStatusException if account is not in ACTIVE status
-     */
     public boolean validatePinWithAttemptTracking(String enteredPin) 
             throws AccountLockedException, AccountStatusException {
         

@@ -110,7 +110,7 @@ public class Lab1Console {
         
         System.out.print("Initial Balance (RWF): ");
         double initialBalance = scanner.nextDouble();
-        scanner.nextLine();  // Consume newline
+        scanner.nextLine();
         
         System.out.print("Account PIN (4+ digits): ");
         String pin = scanner.nextLine().trim();
@@ -180,7 +180,7 @@ public class Lab1Console {
         
         System.out.print("Amount (RWF): ");
         double amount = scanner.nextDouble();
-        scanner.nextLine();  // Consume newline
+        scanner.nextLine();
         
         System.out.print("Reference ID (e.g., TXN-001): ");
         String referenceId = scanner.nextLine().trim();
@@ -305,11 +305,11 @@ public class Lab1Console {
             try {
                 System.out.print(prompt);
                 int input = scanner.nextInt();
-                scanner.nextLine();  // Consume newline
+                scanner.nextLine();
                 return input;
             } catch (Exception e) {
                 System.out.println("✗ Invalid input. Please enter a number.");
-                scanner.nextLine();  // Clear invalid input
+                scanner.nextLine();
             }
         }
     }
